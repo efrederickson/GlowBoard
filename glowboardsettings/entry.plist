@@ -1,0 +1,10 @@
+{
+	entry = {
+		bundle = GlowBoardSettings;
+		cell = PSLinkCell;
+		detail = "GBSettingsListController";
+		icon = "GlowBoardSettings.png";
+		isController = 1;
+		label = GlowBoard;
+	};
+}
