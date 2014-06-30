@@ -1,11 +1,14 @@
 #import "SpringBoard.h"
-#import "UIColor+HexString.h"
 #import <UIKit/UIBezierPath.h>
+#import "Apex/STKGroupView.h"
+#import "Apex/STKGroup.h"
+#import "Apex/STKGroupLayout.h"
 
 #define RILog(fmt, ...) NSLog((@"[GlowBoard] " fmt), ##__VA_ARGS__)
 
 NSMutableSet *runningIcons;
 NSMutableSet *badgedIcons;
+NSMutableSet *suppressedIcons;
 
 BOOL enabled = YES;
 BOOL showInSwitcher = YES;
@@ -117,7 +120,7 @@ UIView *getOrCreateGlowView(SBIconView *v)
         //[v insertSubView:view beforeSubview:v._iconImageView];
     }
 
-    if ([runningIcons containsObject:v.icon] == NO && [badgedIcons containsObject:v.icon] == NO)
+    if (([runningIcons containsObject:v.icon] == NO && [badgedIcons containsObject:v.icon] == NO) || [suppressedIcons containsObject:v.icon])
     {
         [view removeFromSuperview];
         [view release];
@@ -129,6 +132,8 @@ UIView *getOrCreateGlowView(SBIconView *v)
     view.backgroundColor = [UIColor clearColor];
 
     // pulse animation (for badge/running)
+    if ([view.layer animationForKey:@"pulse"] == nil)
+    {
     [view.layer removeAnimationForKey:@"pulse"];
     CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
     animation.fromValue = @0.2; // .1
@@ -143,10 +148,14 @@ UIView *getOrCreateGlowView(SBIconView *v)
     view.layer.shadowColor = ([runningIcons containsObject:v.icon] ? activeColor : badgedColor).CGColor;
     view.layer.shadowOpacity = 1;
     view.layer.shadowPath = [UIBezierPath bezierPathWithRect:view.bounds].CGPath;
-
+    }
+    
     // grow animation for a badge
     if ([badgedIcons containsObject:v.icon])
     {
+        if ([v.layer animationForKey:@"transform"] != nil)
+            return view;
+
         [v.layer removeAnimationForKey:@"transform"];
         CAAnimationGroup *animationGroup = [CAAnimationGroup animation];
         animationGroup.duration = 3.5;
@@ -191,7 +200,7 @@ UIView *getOrCreateGlowView(SBIconView *v)
             animation.values = values;
             animation.autoreverses = NO;
 
-            animationGroup.animations = @[transformAnimation, animation];
+            animationGroup.animations = @[animation];
         }
 
         [v.layer addAnimation:animationGroup forKey:@"transform"];
@@ -269,7 +278,6 @@ void ApplicationDied(SBApplication *application)
     getOrCreateGlowView(iconView);
     return iconView;
 }
-
 %end
 
 %hook SBIcon
@@ -294,12 +302,49 @@ void ApplicationDied(SBApplication *application)
 {
     %orig;
     
+    /*
     UIView *view = getOrCreateGlowView(self); 
     
     [view.layer removeAnimationForKey:@"pulse"];
     [view removeFromSuperview];
     [view release];
     [self.layer removeAnimationForKey:@"transform"];
+    */
+}
+%end
+
+// APEX 2
+/*
+%hook STKGroupView
+- (void)_animateOpenWithCompletion:(id)arg1
+{ %orig;
+    for (SBIcon *icon in self.group.layout.allIcons)
+    {
+        [suppressedIcons removeObject:icon];
+        getOrCreateGlowView([[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon]);
+    }
+}
+
+- (void)_animateClosedWithCompletion:(id)arg1
+{ %orig;
+    for (SBIcon *icon in self.group.layout.allIcons)
+    {
+        [suppressedIcons addObject:icon];
+        getOrCreateGlowView([[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon]);
+    }
+}
+%end
+*/
+
+%hook STKGroupLayout
+- (void)addIcon:(id)arg1 toIconsAtPosition:(unsigned long long)arg2 {
+    %orig; 
+    [suppressedIcons addObject:arg1];
+}
+
+- (void)removeIcon:(id)arg1 fromIconsAtPosition:(unsigned long long)arg2 {
+    %orig;
+    [suppressedIcons removeObject:arg1];
 }
 %end
 
@@ -312,6 +357,7 @@ void ApplicationDied(SBApplication *application)
 	%init;
 	runningIcons = [[NSMutableSet alloc] init];
     badgedIcons = [[NSMutableSet alloc] init];
+    suppressedIcons = [[NSMutableSet alloc] init];
     reloadSettings(NULL, NULL, NULL, NULL, NULL);
 	[pool drain];
 }
