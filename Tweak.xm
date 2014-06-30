@@ -134,21 +134,21 @@ UIView *getOrCreateGlowView(SBIconView *v)
     // pulse animation (for badge/running)
     if ([view.layer animationForKey:@"pulse"] == nil)
     {
-    [view.layer removeAnimationForKey:@"pulse"];
-    CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
-    animation.fromValue = @0.2; // .1
-    animation.toValue = @1;
-    animation.repeatCount = INFINITY;
-    animation.duration = 1; // 1.2
-    animation.autoreverses = YES;
-    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    [view.layer addAnimation:animation forKey:@"pulse"];
+        [view.layer removeAnimationForKey:@"pulse"];
+        CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+        animation.fromValue = @0.2; // .1
+        animation.toValue = @1;
+        animation.repeatCount = INFINITY;
+        animation.duration = 1; // 1.2
+        animation.autoreverses = YES;
+        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        [view.layer addAnimation:animation forKey:@"pulse"];
 
-    view.layer.shadowRadius = 10;
-    view.layer.shadowColor = ([runningIcons containsObject:v.icon] ? activeColor : badgedColor).CGColor;
-    view.layer.shadowOpacity = 1;
-    view.layer.shadowPath = [UIBezierPath bezierPathWithRect:view.bounds].CGPath;
+        view.layer.shadowRadius = 10;
+        view.layer.shadowOpacity = 1;
+        view.layer.shadowPath = [UIBezierPath bezierPathWithRect:view.bounds].CGPath;
     }
+    view.layer.shadowColor = ([runningIcons containsObject:v.icon] ? activeColor : badgedColor).CGColor;
 
     // grow animation for a badge
     if ([badgedIcons containsObject:v.icon])
@@ -293,7 +293,7 @@ void ApplicationDied(SBApplication *application)
     else if (self.badgeValue > 0)
         [badgedIcons addObject:self];
 
-    getOrCreateGlowView([[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:self]);
+    [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:self];
 }
 %end
 
@@ -321,7 +321,7 @@ void ApplicationDied(SBApplication *application)
     for (SBIcon *icon in self.group.layout.allIcons)
     {
         [suppressedIcons removeObject:icon];
-        getOrCreateGlowView([[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon]);
+        [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
     }
 }
 
