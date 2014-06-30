@@ -149,7 +149,7 @@ UIView *getOrCreateGlowView(SBIconView *v)
     view.layer.shadowOpacity = 1;
     view.layer.shadowPath = [UIBezierPath bezierPathWithRect:view.bounds].CGPath;
     }
-    
+
     // grow animation for a badge
     if ([badgedIcons containsObject:v.icon])
     {

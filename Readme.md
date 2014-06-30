@@ -19,7 +19,7 @@ Features:
 Conflicts with BounceNotify, although implements same features.
 
 TODO:
-- Apex compatibility
+- Apex compatibility - unsuppress apex’ed icons when apex view is open
 - respring button in settings
 - keep underlay behind icons (randomly and occasionally goes in front)
 - More custom colors
