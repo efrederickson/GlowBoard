@@ -156,7 +156,9 @@ UIView *getOrCreateGlowView(SBIconView *v)
         animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         [view.layer addAnimation:animation forKey:@"pulse"];
     }
-    
+    else if (!animateGlow)
+        [view.layer removeAnimationForKey:@"pulse"];
+
     view.layer.shadowRadius = 10;
     view.layer.shadowOpacity = 1;
     view.layer.shadowPath = [UIBezierPath bezierPathWithRect:view.bounds].CGPath;
