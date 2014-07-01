@@ -101,25 +101,25 @@ void reloadSettings(CFNotificationCenterRef center,
         badgedColor = [UIColor redColor];
 }
 
-UIView *getOrCreateGlowView(SBIconView *v)
+void updateGlowView(SBIconView *v)
 {
     if (((SpringBoard *)[UIApplication sharedApplication]).isLocked)
-        return nil;
+        return;
 
     if (!enabled)
-        return nil;
+        return;
         
     if ([v isKindOfClass:[%c(SBFolderIconView) class]] && glowFolders == NO)
-        return nil;
+        return;
 
     if (glowDock == NO && [v isInDock])
-        return nil;
+        return;
 
     if (([runningIcons containsObject:v.icon] == NO && [badgedIcons containsObject:v.icon] == NO) || [suppressedIcons containsObject:v.icon])
     {
         [v._iconImageView.layer removeAnimationForKey:@"pulse"];
         [v.layer removeAnimationForKey:@"transform"];
-        return nil;
+        return;
     }
 
     // pulse animation (for badge/running)
@@ -147,7 +147,7 @@ UIView *getOrCreateGlowView(SBIconView *v)
     if ([badgedIcons containsObject:v.icon])
     {
         if ([v.layer animationForKey:@"transform"] != nil)
-            return nil;
+            return;
 
         [v.layer removeAnimationForKey:@"transform"];
         CAAnimationGroup *animationGroup = [CAAnimationGroup animation];
@@ -202,8 +202,6 @@ UIView *getOrCreateGlowView(SBIconView *v)
     {
         [v.layer removeAnimationForKey:@"transform"];
     }
-
-    return nil;
 }
 
 void ApplicationLaunched(SBApplication *application)
@@ -262,13 +260,13 @@ void ApplicationDied(SBApplication *application)
 	%orig;
 
 	if (([runningIcons containsObject:icon] || [badgedIcons containsObject:icon]) && (showInSwitcher || self == [%c(SBIconViewMap) homescreenMap]))
-        getOrCreateGlowView(iconView);
+        updateGlowView(iconView);
 }
 
 - (id)mappedIconViewForIcon:(id)arg1
 {
     SBIconView *iconView = %orig;
-    getOrCreateGlowView(iconView);
+    updateGlowView(iconView);
     return iconView;
 }
 %end
@@ -302,7 +300,7 @@ void ApplicationDied(SBApplication *application)
         {
             [suppressedIcons removeObject:icon];
             if (icon)
-                getOrCreateGlowView(view);
+                updateGlowView(view);
         }
     }
 }
@@ -317,7 +315,7 @@ void ApplicationDied(SBApplication *application)
         {
             [suppressedIcons addObject:icon];
             if (icon)
-                getOrCreateGlowView(view);
+                updateGlowView(view);
         }
     }
 }
