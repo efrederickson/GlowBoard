@@ -20,6 +20,7 @@
 - (void)showDropGlow:(BOOL)showDropGlow;
 - (long long)badgeValue;
 - (id)leafIdentifier;
+- (SBApplication*)application;
 @end
 
 @interface SBIconController (iOS40)

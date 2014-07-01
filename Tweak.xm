@@ -11,8 +11,6 @@ struct STKGroupSlot {
 
 #define RILog(fmt, ...) NSLog((@"[GlowBoard] " fmt), ##__VA_ARGS__)
 
-NSMutableSet *runningIcons;
-NSMutableSet *badgedIcons;
 NSMutableSet *suppressedIcons;
 
 BOOL enabled = YES;
@@ -22,7 +20,7 @@ BOOL animateNotifications = YES;
 BOOL glowFolders = NO;
 BOOL bounceDock = YES;
 BOOL animateGlow = YES;
-UIColor *badgedColor = [UIColor redColor]; //[UIColor colorWithHexString:@"ae5252"];
+UIColor *badgedColor = [UIColor redColor];
 UIColor *activeColor = [UIColor whiteColor];
 
 void reloadSettings(CFNotificationCenterRef center,
@@ -115,10 +113,11 @@ void updateGlowView(SBIconView *v)
     if (glowDock == NO && [v isInDock])
         return;
 
-    if (([runningIcons containsObject:v.icon] == NO && [badgedIcons containsObject:v.icon] == NO) || [suppressedIcons containsObject:v.icon])
+    if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0) || [suppressedIcons containsObject:v.icon])
     {
         [v._iconImageView.layer removeAnimationForKey:@"pulse"];
         [v.layer removeAnimationForKey:@"transform"];
+        v._iconImageView.layer.shadowOpacity = 0;
         return;
     }
 
@@ -134,17 +133,21 @@ void updateGlowView(SBIconView *v)
         animation.autoreverses = YES;
         animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         [v._iconImageView.layer addAnimation:animation forKey:@"pulse"];
+
+        v._iconImageView.layer.shadowOpacity = 1;
     }
     else if (!animateGlow)
+    {
         [v._iconImageView.layer removeAnimationForKey:@"pulse"];
+        v._iconImageView.layer.shadowOpacity = 1;
+    }
 
     v._iconImageView.layer.shadowRadius = 15;
-    v._iconImageView.layer.shadowOpacity = 1;
     v._iconImageView.layer.shadowPath = [UIBezierPath bezierPathWithRect:v._iconImageView.layer.bounds].CGPath;
-    v._iconImageView.layer.shadowColor = ([runningIcons containsObject:v.icon] ? activeColor : badgedColor).CGColor;
+    v._iconImageView.layer.shadowColor = (v.icon.application.isRunning ? activeColor : badgedColor).CGColor;
 
     // grow animation for a badge
-    if ([badgedIcons containsObject:v.icon])
+    if (v.icon.badgeValue > 0)
     {
         if ([v.layer animationForKey:@"transform"] != nil)
             return;
@@ -212,7 +215,6 @@ void ApplicationLaunched(SBApplication *application)
 	SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:[application displayIdentifier]];
 	if (icon) 
     {
-		[runningIcons addObject:icon];
 		[[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
 	}
 }
@@ -224,23 +226,9 @@ void ApplicationDied(SBApplication *application)
 
 	SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:[application displayIdentifier]];
 	if (icon) {
-		[runningIcons removeObject:icon];
 		[[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
 	}
 }
-
-%hook SBAppSliderController
-- (void)_appActivationStateDidChange:(NSNotification *)notification
-{
-    %orig;
-
-	SBApplication *app = notification.object;
-	if ([app isRunning])
-		ApplicationLaunched(app);
-	else
-		ApplicationDied(app);
-}
-%end
 
 %hook SBApplication
 - (void)setRunning:(_Bool)arg1
@@ -259,8 +247,10 @@ void ApplicationDied(SBApplication *application)
 {
 	%orig;
 
-	if (([runningIcons containsObject:icon] || [badgedIcons containsObject:icon]) && (showInSwitcher || self == [%c(SBIconViewMap) homescreenMap]))
+	if ((icon.application.isRunning || icon.badgeValue != 0) && (showInSwitcher || self == [%c(SBIconViewMap) homescreenMap]))
+    {
         updateGlowView(iconView);
+    }
 }
 
 - (id)mappedIconViewForIcon:(id)arg1
@@ -278,11 +268,6 @@ void ApplicationDied(SBApplication *application)
     
     if (!animateNotifications)
         return;
-
-    if (self.badgeValue == 0)
-        [badgedIcons removeObject:self];
-    else if (self.badgeValue > 0)
-        [badgedIcons addObject:self];
 
     [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:self];
 }
@@ -326,8 +311,6 @@ void ApplicationDied(SBApplication *application)
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     CFNotificationCenterRef r = CFNotificationCenterGetDarwinNotifyCenter();
     CFNotificationCenterAddObserver(r, NULL, &reloadSettings, CFSTR("com.efrederickson.glowboard/reloadSettings"), NULL, 0);
-	runningIcons = [[NSMutableSet alloc] init];
-    badgedIcons = [[NSMutableSet alloc] init];
     suppressedIcons = [[NSMutableSet alloc] init];
     reloadSettings(NULL, NULL, NULL, NULL, NULL);
 
