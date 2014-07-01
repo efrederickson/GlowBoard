@@ -126,10 +126,10 @@ void updateGlowView(SBIconView *v)
     {
         [v._iconImageView.layer removeAnimationForKey:@"pulse"];
         CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
-        animation.fromValue = @0.2; // .1
+        animation.fromValue = @.2;
         animation.toValue = @1;
         animation.repeatCount = INFINITY;
-        animation.duration = 1.2; // 1.2
+        animation.duration = 1.2;
         animation.autoreverses = YES;
         animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         [v._iconImageView.layer addAnimation:animation forKey:@"pulse"];
@@ -142,12 +142,15 @@ void updateGlowView(SBIconView *v)
         v._iconImageView.layer.shadowOpacity = 1;
     }
 
-    v._iconImageView.layer.shadowRadius = 15;
+    v._iconImageView.layer.shadowRadius = 10;
     v._iconImageView.layer.shadowPath = [UIBezierPath bezierPathWithRect:v._iconImageView.layer.bounds].CGPath;
     v._iconImageView.layer.shadowColor = (v.icon.application.isRunning ? activeColor : badgedColor).CGColor;
 
+    //v._iconImageView.layer.rasterizationScale = [[UIScreen mainScreen] scale];
+    //v._iconImageView.layer.shouldRasterize = YES;
+
     // grow animation for a badge
-    if (v.icon.badgeValue > 0)
+    if (v.icon.badgeValue > 0 && animateNotifications)
     {
         if ([v.layer animationForKey:@"transform"] != nil)
             return;
@@ -247,7 +250,7 @@ void ApplicationDied(SBApplication *application)
 {
 	%orig;
 
-	if ((icon.application.isRunning || icon.badgeValue != 0) && (showInSwitcher || self == [%c(SBIconViewMap) homescreenMap]))
+	if (showInSwitcher || self == [%c(SBIconViewMap) homescreenMap])
     {
         updateGlowView(iconView);
     }
@@ -265,9 +268,6 @@ void ApplicationDied(SBApplication *application)
 -(void) noteBadgeDidChange
 {
     %orig;
-    
-    if (!animateNotifications)
-        return;
 
     [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:self];
 }
@@ -284,8 +284,7 @@ void ApplicationDied(SBApplication *application)
         if ([suppressedIcons containsObject:icon])
         {
             [suppressedIcons removeObject:icon];
-            if (icon)
-                updateGlowView(view);
+            updateGlowView(view);
         }
     }
 }
@@ -299,10 +298,20 @@ void ApplicationDied(SBApplication *application)
         if ([suppressedIcons containsObject:view.icon] == NO)
         {
             [suppressedIcons addObject:icon];
-            if (icon)
-                updateGlowView(view);
+            updateGlowView(view);
         }
     }
+}
+%end
+
+%hook CALayer
+-(CGColorRef) shadowColor
+{
+    if ([self.delegate isKindOfClass:[%c(SBIconImageView) class]])
+    {
+        return (((SBIconImageView*)self.delegate).icon.application.isRunning ? activeColor : badgedColor).CGColor;
+    }
+    return %orig;
 }
 %end
 

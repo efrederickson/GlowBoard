@@ -22,5 +22,6 @@ Conflicts with BounceNotify, although implements same features.
 TODO:
 - respring button in settings
 - More custom colors
-- Option for either old outline or glow
+- Option for either old outline (using cornerRadius) or glow
 - Dynamic/Adaptive color (https://github.com/NikolaiRuhe/UIImageAverageColor/blob/master/UIImageAverageColor/UIImageAverageColorAddition.m)
+- Fix auxo2 compatibility (glow doesn’t show right)
