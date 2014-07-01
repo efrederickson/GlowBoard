@@ -104,16 +104,7 @@ void updateGlowView(SBIconView *v)
     if (((SpringBoard *)[UIApplication sharedApplication]).isLocked)
         return;
 
-    if (!enabled)
-        return;
-        
-    if ([v isKindOfClass:[%c(SBFolderIconView) class]] && glowFolders == NO)
-        return;
-
-    if (glowDock == NO && [v isInDock])
-        return;
-
-    if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0) || [suppressedIcons containsObject:v.icon])
+    if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0) || [suppressedIcons containsObject:v.icon] || enabled == NO || ([v isKindOfClass:[%c(SBFolderIconView) class]] && glowFolders == NO) || (glowDock == NO && [v isInDock]))
     {
         [v._iconImageView.layer removeAnimationForKey:@"pulse"];
         [v.layer removeAnimationForKey:@"transform"];

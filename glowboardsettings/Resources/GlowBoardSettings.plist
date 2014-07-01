@@ -109,8 +109,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSLinkListCell</string>
-    			<key>detail</key>
-    			<string>PSListItemsController</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
 			<key>default</key>
 			<integer>0</integer>
 			<key>defaults</key>
@@ -139,8 +139,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSLinkListCell</string>
-     			<key>detail</key>
-    			<string>PSListItemsController</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
 			<key>default</key>
 			<integer>2</integer>
 			<key>defaults</key>
@@ -166,12 +166,11 @@
 				<integer>3</integer>
 			</array>
 		</dict>
-
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>Copyright 2014 Elijah Frederickson. Respring to apply changes.</string>
+			<string>Copyright 2014 Elijah Frederickson.</string>
 		</dict>
 	</array>
 	<key>title</key>
