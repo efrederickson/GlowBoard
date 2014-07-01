@@ -3,6 +3,10 @@
 #import "Apex/STKGroupView.h"
 #import "Apex/STKGroup.h"
 #import "Apex/STKGroupLayout.h"
+struct STKGroupSlot {
+    unsigned long long position;
+    unsigned long long index;
+};
 
 #define RILog(fmt, ...) NSLog((@"[GlowBoard] " fmt), ##__VA_ARGS__)
 
@@ -93,6 +97,9 @@ void reloadSettings(CFNotificationCenterRef center,
 
 UIView *getOrCreateGlowView(SBIconView *v)
 {
+    if (((SpringBoard *)[UIApplication sharedApplication]).isLocked)
+        return nil;
+
     if (!enabled)
         return nil;
         
@@ -139,15 +146,15 @@ UIView *getOrCreateGlowView(SBIconView *v)
         animation.fromValue = @0.2; // .1
         animation.toValue = @1;
         animation.repeatCount = INFINITY;
-        animation.duration = 1; // 1.2
+        animation.duration = 1.2; // 1.2
         animation.autoreverses = YES;
         animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         [view.layer addAnimation:animation forKey:@"pulse"];
-
-        view.layer.shadowRadius = 10;
-        view.layer.shadowOpacity = 1;
-        view.layer.shadowPath = [UIBezierPath bezierPathWithRect:view.bounds].CGPath;
     }
+    
+    view.layer.shadowRadius = 10;
+    view.layer.shadowOpacity = 1;
+    view.layer.shadowPath = [UIBezierPath bezierPathWithRect:view.bounds].CGPath;
     view.layer.shadowColor = ([runningIcons containsObject:v.icon] ? activeColor : badgedColor).CGColor;
 
     // grow animation for a badge
@@ -183,7 +190,7 @@ UIView *getOrCreateGlowView(SBIconView *v)
 
             NSMutableArray *values = [NSMutableArray array];
 
-            int iconHeight = 90;
+            int iconHeight = 80;
 
             for (int i=0; i<36; i++)
             {
@@ -297,54 +304,36 @@ void ApplicationDied(SBApplication *application)
 }
 %end
 
-%hook SBIconView
-- (void)removeAllIconAnimations
-{
-    %orig;
-    
-    /*
-    UIView *view = getOrCreateGlowView(self); 
-    
-    [view.layer removeAnimationForKey:@"pulse"];
-    [view removeFromSuperview];
-    [view release];
-    [self.layer removeAnimationForKey:@"transform"];
-    */
-}
-%end
-
 // APEX 2
-/*
 %hook STKGroupView
 - (void)_animateOpenWithCompletion:(id)arg1
-{ %orig;
-    for (SBIcon *icon in self.group.layout.allIcons)
+{ 
+    %orig;
+    for (SBIconView *view in self.subappLayout.allIcons)
     {
-        [suppressedIcons removeObject:icon];
-        [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
+        SBIcon *icon = view.icon;
+        if ([suppressedIcons containsObject:icon])
+        {
+            [suppressedIcons removeObject:icon];
+            if (icon)
+                getOrCreateGlowView(view);
+        }
     }
 }
 
 - (void)_animateClosedWithCompletion:(id)arg1
-{ %orig;
-    for (SBIcon *icon in self.group.layout.allIcons)
-    {
-        [suppressedIcons addObject:icon];
-        getOrCreateGlowView([[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon]);
-    }
-}
-%end
-*/
-
-%hook STKGroupLayout
-- (void)addIcon:(id)arg1 toIconsAtPosition:(unsigned long long)arg2 {
-    %orig; 
-    [suppressedIcons addObject:arg1];
-}
-
-- (void)removeIcon:(id)arg1 fromIconsAtPosition:(unsigned long long)arg2 {
+{ 
     %orig;
-    [suppressedIcons removeObject:arg1];
+    for (SBIconView *view in self.subappLayout.allIcons)
+    {
+        SBIcon *icon = view.icon;
+        if ([suppressedIcons containsObject:view.icon] == NO)
+        {
+            [suppressedIcons addObject:icon];
+            if (icon)
+                getOrCreateGlowView(view);
+        }
+    }
 }
 %end
 
@@ -353,11 +342,12 @@ void ApplicationDied(SBApplication *application)
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     CFNotificationCenterRef r = CFNotificationCenterGetDarwinNotifyCenter();
     CFNotificationCenterAddObserver(r, NULL, &reloadSettings, CFSTR("com.efrederickson.glowboard/reloadSettings"), NULL, 0);
-
-	%init;
 	runningIcons = [[NSMutableSet alloc] init];
     badgedIcons = [[NSMutableSet alloc] init];
     suppressedIcons = [[NSMutableSet alloc] init];
     reloadSettings(NULL, NULL, NULL, NULL, NULL);
+
+	%init;
+
 	[pool drain];
 }
