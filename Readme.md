@@ -15,6 +15,7 @@ Features:
 - Grow animation on badged apps
 - Dock bounce on badged apps
 - Less CPU and battery usage than ActiveBoard
+- A multitude of options
 
 Conflicts with BounceNotify, although implements same features.
 
@@ -23,4 +24,3 @@ TODO:
 - keep underlay behind icons (randomly and occasionally goes in front)
 - More custom colors
 - Option for either old outline or glow
-- option to not animate glow
