@@ -21,6 +21,6 @@ Conflicts with BounceNotify, although implements same features.
 
 TODO:
 - respring button in settings
-- keep underlay behind icons (randomly and occasionally goes in front)
 - More custom colors
 - Option for either old outline or glow
+- Dynamic/Adaptive color (https://github.com/NikolaiRuhe/UIImageAverageColor/blob/master/UIImageAverageColor/UIImageAverageColorAddition.m)

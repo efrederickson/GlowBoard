@@ -7,6 +7,7 @@ struct STKGroupSlot {
     unsigned long long position;
     unsigned long long index;
 };
+#import <UIKit/UIScreen.h>
 
 #define RILog(fmt, ...) NSLog((@"[GlowBoard] " fmt), ##__VA_ARGS__)
 
@@ -114,61 +115,39 @@ UIView *getOrCreateGlowView(SBIconView *v)
     if (glowDock == NO && [v isInDock])
         return nil;
 
-    UIView *view;
-    if ([v viewWithTag:1337] != nil)
-    {
-        view = [v viewWithTag:1337];
-    }
-    else
-    {
-        CGRect frame = v._iconImageView.visibleBounds;
-        view = [[UIView alloc] initWithFrame:CGRectMake(frame.origin.x - 3, frame.origin.y - 3, frame.size.width + 5, frame.size.height + 5)];
-        view.tag = 1337;
-        view.layer.cornerRadius = 15;
-        //[v insertSubview:view atIndex:4];
-        int index = [v.subviews indexOfObject:v._iconImageView];
-        if (index >= 0)
-            [v insertSubview:view atIndex:index-1];
-        //[v insertSubView:view beforeSubview:v._iconImageView];
-    }
-
     if (([runningIcons containsObject:v.icon] == NO && [badgedIcons containsObject:v.icon] == NO) || [suppressedIcons containsObject:v.icon])
     {
-        [view removeFromSuperview];
-        [view release];
-        view = nil;
+        [v._iconImageView.layer removeAnimationForKey:@"pulse"];
         [v.layer removeAnimationForKey:@"transform"];
         return nil;
     }
 
-    view.backgroundColor = [UIColor clearColor];
-
     // pulse animation (for badge/running)
-    if ([view.layer animationForKey:@"pulse"] == nil && animateGlow)
+    if ([v._iconImageView.layer animationForKey:@"pulse"] == nil && animateGlow)
     {
-        [view.layer removeAnimationForKey:@"pulse"];
-        CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+        [v._iconImageView.layer removeAnimationForKey:@"pulse"];
+        CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
         animation.fromValue = @0.2; // .1
         animation.toValue = @1;
         animation.repeatCount = INFINITY;
         animation.duration = 1.2; // 1.2
         animation.autoreverses = YES;
         animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-        [view.layer addAnimation:animation forKey:@"pulse"];
+        [v._iconImageView.layer addAnimation:animation forKey:@"pulse"];
     }
     else if (!animateGlow)
-        [view.layer removeAnimationForKey:@"pulse"];
+        [v._iconImageView.layer removeAnimationForKey:@"pulse"];
 
-    view.layer.shadowRadius = 10;
-    view.layer.shadowOpacity = 1;
-    view.layer.shadowPath = [UIBezierPath bezierPathWithRect:view.bounds].CGPath;
-    view.layer.shadowColor = ([runningIcons containsObject:v.icon] ? activeColor : badgedColor).CGColor;
+    v._iconImageView.layer.shadowRadius = 15;
+    v._iconImageView.layer.shadowOpacity = 1;
+    v._iconImageView.layer.shadowPath = [UIBezierPath bezierPathWithRect:v._iconImageView.layer.bounds].CGPath;
+    v._iconImageView.layer.shadowColor = ([runningIcons containsObject:v.icon] ? activeColor : badgedColor).CGColor;
 
     // grow animation for a badge
     if ([badgedIcons containsObject:v.icon])
     {
         if ([v.layer animationForKey:@"transform"] != nil)
-            return view;
+            return nil;
 
         [v.layer removeAnimationForKey:@"transform"];
         CAAnimationGroup *animationGroup = [CAAnimationGroup animation];
@@ -224,7 +203,7 @@ UIView *getOrCreateGlowView(SBIconView *v)
         [v.layer removeAnimationForKey:@"transform"];
     }
 
-    return view;
+    return nil;
 }
 
 void ApplicationLaunched(SBApplication *application)
