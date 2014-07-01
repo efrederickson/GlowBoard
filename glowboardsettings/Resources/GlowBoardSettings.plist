@@ -44,6 +44,20 @@
 			<key>defaults</key>
 			<string>com.efrederickson.glowboard.settings</string>
 			<key>key</key>
+			<string>animateGlow</string>
+			<key>label</key>
+			<string>Animate Glow</string>
+			<key>PostNotification</key>
+			<string>com.efrederickson.glowboard/reloadSettings</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.efrederickson.glowboard.settings</string>
+			<key>key</key>
 			<string>glowDock</string>
 			<key>label</key>
 			<string>Animate Dock</string>

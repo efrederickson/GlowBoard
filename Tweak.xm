@@ -20,6 +20,7 @@ BOOL glowDock = YES;
 BOOL animateNotifications = YES;
 BOOL glowFolders = NO;
 BOOL bounceDock = YES;
+BOOL animateGlow = YES;
 UIColor *badgedColor = [UIColor redColor]; //[UIColor colorWithHexString:@"ae5252"];
 UIColor *activeColor = [UIColor whiteColor];
 
@@ -62,6 +63,10 @@ void reloadSettings(CFNotificationCenterRef center,
     else
         bounceDock = YES;
 
+    if ([prefs objectForKey:@"animateGlow"] != nil)
+        animateGlow = [[prefs objectForKey:@"animateGlow"] boolValue];
+    else
+        animateGlow = YES;
 
     if ([prefs objectForKey:@"activeColor"] != nil)
     {
@@ -139,7 +144,7 @@ UIView *getOrCreateGlowView(SBIconView *v)
     view.backgroundColor = [UIColor clearColor];
 
     // pulse animation (for badge/running)
-    if ([view.layer animationForKey:@"pulse"] == nil)
+    if ([view.layer animationForKey:@"pulse"] == nil && animateGlow)
     {
         [view.layer removeAnimationForKey:@"pulse"];
         CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
