@@ -11,6 +11,9 @@ struct STKGroupSlot {
 
 #define RILog(fmt, ...) NSLog((@"[GlowBoard] " fmt), ##__VA_ARGS__)
 
+#define kGB_NotifAnimKey @"GB_NotifAnimKey"
+#define kGB_PulseAnimKey @"GB_PulseAnimKey"
+
 NSMutableSet *suppressedIcons;
 
 BOOL enabled = YES;
@@ -106,16 +109,16 @@ void updateGlowView(SBIconView *v)
 
     if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0) || [suppressedIcons containsObject:v.icon] || enabled == NO || ([v isKindOfClass:[%c(SBFolderIconView) class]] && glowFolders == NO) || (glowDock == NO && [v isInDock]))
     {
-        [v._iconImageView.layer removeAnimationForKey:@"pulse"];
-        [v.layer removeAnimationForKey:@"transform"];
+        [v._iconImageView.layer removeAnimationForKey:kGB_PulseAnimKey];
+        [v.layer removeAnimationForKey:kGB_NotifAnimKey];
         v._iconImageView.layer.shadowOpacity = 0;
         return;
     }
 
     // pulse animation (for badge/running)
-    if ([v._iconImageView.layer animationForKey:@"pulse"] == nil && animateGlow)
+    if ([v._iconImageView.layer animationForKey:kGB_PulseAnimKey] == nil && animateGlow)
     {
-        [v._iconImageView.layer removeAnimationForKey:@"pulse"];
+        [v._iconImageView.layer removeAnimationForKey:kGB_PulseAnimKey];
         CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
         animation.fromValue = @.2;
         animation.toValue = @1;
@@ -123,16 +126,15 @@ void updateGlowView(SBIconView *v)
         animation.duration = 1.2;
         animation.autoreverses = YES;
         animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-        [v._iconImageView.layer addAnimation:animation forKey:@"pulse"];
+        [v._iconImageView.layer addAnimation:animation forKey:kGB_PulseAnimKey];
 
-        v._iconImageView.layer.shadowOpacity = 1;
     }
     else if (!animateGlow)
     {
-        [v._iconImageView.layer removeAnimationForKey:@"pulse"];
-        v._iconImageView.layer.shadowOpacity = 1;
+        [v._iconImageView.layer removeAnimationForKey:kGB_PulseAnimKey];
     }
 
+    v._iconImageView.layer.shadowOpacity = 1;
     v._iconImageView.layer.shadowRadius = 10;
     v._iconImageView.layer.shadowPath = [UIBezierPath bezierPathWithRect:v._iconImageView.layer.bounds].CGPath;
     v._iconImageView.layer.shadowColor = (v.icon.application.isRunning ? activeColor : badgedColor).CGColor;
@@ -143,10 +145,10 @@ void updateGlowView(SBIconView *v)
     // grow animation for a badge
     if (v.icon.badgeValue > 0 && animateNotifications)
     {
-        if ([v.layer animationForKey:@"transform"] != nil)
+        if ([v.layer animationForKey:kGB_NotifAnimKey] != nil)
             return;
 
-        [v.layer removeAnimationForKey:@"transform"];
+        [v.layer removeAnimationForKey:kGB_NotifAnimKey];
         CAAnimationGroup *animationGroup = [CAAnimationGroup animation];
         animationGroup.duration = 3.5;
         animationGroup.repeatCount = INFINITY;
@@ -162,8 +164,6 @@ void updateGlowView(SBIconView *v)
         if ([v isInDock] && bounceDock)
         {
             // https://github.com/Cocoanetics/Examples/blob/master/IconBouncing/bouncetest/CAKeyFrameAnimation%2BJumping.m#L59-L83
-            //CGFloat factors[32] = {0, 32, 60, 83, 100, 114, 124, 128, 128, 124, 114, 100, 83, 60, 32,
-            //    0, 24, 42, 54, 62, 64, 62, 54, 42, 24, 0, 18, 28, 32, 28, 18, 0};
                 
             CGFloat factors[36] = {0, 32, 60, 83, 100, 114, 124, 128, 128, 124, 114, 100, 83, 60, 32, 0, 
                                    24, 46, 60, 66, 70, 66, 60, 46, 24, 0, 
@@ -193,11 +193,11 @@ void updateGlowView(SBIconView *v)
             animationGroup.animations = @[animation];
         }
 
-        [v.layer addAnimation:animationGroup forKey:@"transform"];
+        [v.layer addAnimation:animationGroup forKey:kGB_NotifAnimKey];
     }
     else
     {
-        [v.layer removeAnimationForKey:@"transform"];
+        [v.layer removeAnimationForKey:kGB_NotifAnimKey];
     }
 }
 

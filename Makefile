@@ -1,4 +1,4 @@
-ARCHS = armv7 arm64
+ARCHS = armv7 armv7s arm64
 THEOS_PACKAGE_DIR_NAME = debs
 
 TWEAK_NAME = GlowBoard
