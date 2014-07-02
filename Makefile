@@ -2,7 +2,7 @@ ARCHS = armv7 armv7s arm64
 THEOS_PACKAGE_DIR_NAME = debs
 
 TWEAK_NAME = GlowBoard
-GlowBoard_FILES = Tweak.xm
+GlowBoard_FILES = Tweak.xm UIImage+AverageColor.m
 GlowBoard_FRAMEWORKS = UIKit QuartzCore CoreGraphics CoreImage
 
 include $(THEOS)/makefiles/common.mk

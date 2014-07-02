@@ -3,6 +3,7 @@
 #import "Apex/STKGroupView.h"
 #import "Apex/STKGroup.h"
 #import "Apex/STKGroupLayout.h"
+#import "UIImage+AverageColor.h"
 struct STKGroupSlot {
     unsigned long long position;
     unsigned long long index;
@@ -23,8 +24,8 @@ BOOL animateNotifications = YES;
 BOOL glowFolders = NO;
 BOOL bounceDock = YES;
 BOOL animateGlow = YES;
-UIColor *badgedColor = [UIColor redColor];
-UIColor *activeColor = [UIColor whiteColor];
+int badgedColorMode = 2;
+int activeColorMode = 0;
 
 void reloadSettings(CFNotificationCenterRef center,
                                     void *observer,
@@ -71,35 +72,14 @@ void reloadSettings(CFNotificationCenterRef center,
         animateGlow = YES;
 
     if ([prefs objectForKey:@"activeColor"] != nil)
-    {
-        int color = [[prefs objectForKey:@"activeColor"] intValue];
-        if (color == 0)
-            activeColor = [UIColor whiteColor];
-        else if (color == 1)
-            activeColor = [UIColor greenColor];
-        else if (color == 2)
-            activeColor = [UIColor redColor];
-        else if (color == 3)
-            activeColor = [UIColor blueColor];
-    }
+        activeColorMode = [[prefs objectForKey:@"activeColor"] intValue];
     else
-        activeColor = [UIColor whiteColor];
-        
+        activeColorMode = 0;
 
     if ([prefs objectForKey:@"badgedColor"] != nil)
-    {
-        int color = [[prefs objectForKey:@"badgedColor"] intValue];
-        if (color == 0)
-            badgedColor = [UIColor whiteColor];
-        else if (color == 1)
-            badgedColor = [UIColor greenColor];
-        else if (color == 2)
-            badgedColor = [UIColor redColor];
-        else if (color == 3)
-            badgedColor = [UIColor blueColor];
-    }
+        badgedColorMode = [[prefs objectForKey:@"badgedColor"] intValue];
     else
-        badgedColor = [UIColor redColor];
+        badgedColorMode = 2;
 }
 
 void updateGlowView(SBIconView *v)
@@ -137,7 +117,7 @@ void updateGlowView(SBIconView *v)
     v._iconImageView.layer.shadowOpacity = 1;
     v._iconImageView.layer.shadowRadius = 10;
     v._iconImageView.layer.shadowPath = [UIBezierPath bezierPathWithRect:v._iconImageView.layer.bounds].CGPath;
-    v._iconImageView.layer.shadowColor = (v.icon.application.isRunning ? activeColor : badgedColor).CGColor;
+    v._iconImageView.layer.shadowColor = [UIColor whiteColor].CGColor;
 
     //v._iconImageView.layer.rasterizationScale = [[UIScreen mainScreen] scale];
     //v._iconImageView.layer.shouldRasterize = YES;
@@ -300,7 +280,22 @@ void ApplicationDied(SBApplication *application)
 {
     if ([self.delegate isKindOfClass:[%c(SBIconImageView) class]])
     {
-        return (((SBIconImageView*)self.delegate).icon.application.isRunning ? activeColor : badgedColor).CGColor;
+        int color = (((SBIconImageView*)self.delegate).icon.application.isRunning ? activeColorMode : badgedColorMode);
+        UIColor *c = [UIColor whiteColor];
+        if (color == 0)
+            c = [UIColor whiteColor];
+        else if (color == 1)
+            c = [UIColor greenColor];
+        else if (color == 2)
+            c = [UIColor redColor];
+        else if (color == 3)
+            c = [UIColor blueColor];
+        else if (color == 4)
+            c = [UIColor blackColor];
+        else if (color == 5)
+            c = [((SBIconImageView*)self.delegate).contentsImage averageColor];
+
+        return c.CGColor;
     }
     return %orig;
 }
