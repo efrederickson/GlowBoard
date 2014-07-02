@@ -22,3 +22,4 @@ Conflicts with BounceNotify, although implements same features.
 TODO:
 - More custom colors
 - Option for either old outline (using cornerRadius) or glow
+- Active (dock) indicator (none, line underneath, dot)
