@@ -124,10 +124,10 @@
 			<key>validTitles</key>
 			<array>
 				<string>White</string>
-				<string>Green</string>
+				<string>g</string>
 				<string>Red</string>
-				<string>Blue</string>
-				<string>Gray</string>
+				<string>b</string>
+				<string>Dark</string>
 				<string>Adaptive</string>
 			</array>
 			<key>validValues</key>
@@ -158,10 +158,10 @@
 			<key>validTitles</key>
 			<array>
 				<string>White</string>
-				<string>Green</string>
+				<string>g</string>
 				<string>Red</string>
-				<string>Blue</string>
-				<string>Gray</string>
+				<string>b</string>
+				<string>Dark</string>
 				<string>Adaptive</string>
 			</array>
 			<key>validValues</key>
