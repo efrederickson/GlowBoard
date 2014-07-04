@@ -4,7 +4,7 @@
 #import "Apex/STKGroup.h"
 #import "Apex/STKGroupLayout.h"
 #import "UIImage+AverageColor.h"
-struct STKGroupSlot {
+struct STKGroupSlot { // Apex 2
     unsigned long long position;
     unsigned long long index;
 };
@@ -84,8 +84,8 @@ void reloadSettings(CFNotificationCenterRef center,
 
 void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
 {
-    if (((SpringBoard *)[UIApplication sharedApplication]).isLocked)
-        return;
+    //if (((SpringBoard *)[UIApplication sharedApplication]).isLocked)
+    //    return;
 
     if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0) || [suppressedIcons containsObject:v.icon] || enabled == NO || ([v isKindOfClass:[%c(SBFolderIconView) class]] && glowFolders == NO) || (glowDock == NO && [v isInDock]))
     {
@@ -98,7 +98,7 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
     // pulse animation (for badge/running)
     if ([v._iconImageView.layer animationForKey:kGB_PulseAnimKey] == nil && animateGlow)
     {
-        [v._iconImageView.layer removeAnimationForKey:kGB_PulseAnimKey];
+        [v._iconImageView.layer removeAnimationForKey:kGB_PulseAnimKey]; // ... its already nil ...
         CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
         animation.fromValue = @.2;
         animation.toValue = @1;
@@ -117,7 +117,7 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
     v._iconImageView.layer.shadowOpacity = 1;
     v._iconImageView.layer.shadowRadius = 10;
     v._iconImageView.layer.shadowPath = [UIBezierPath bezierPathWithRect:v._iconImageView.layer.bounds].CGPath;
-    v._iconImageView.layer.shadowColor = [UIColor whiteColor].CGColor;
+    v._iconImageView.layer.shadowColor = [UIColor whiteColor].CGColor; // This is handled later in the CALayer hook
 
     // grow animation for a badge
     if ((v.icon.badgeValue > 0 || forceNotif) && animateNotifications)
@@ -125,7 +125,7 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
         if ([v.layer animationForKey:kGB_NotifAnimKey] != nil)
             return;
 
-        [v.layer removeAnimationForKey:kGB_NotifAnimKey];
+        [v.layer removeAnimationForKey:kGB_NotifAnimKey]; // ... same here its already nil ...
         CAAnimationGroup *animationGroup = [CAAnimationGroup animation];
         animationGroup.duration = 3.5;
         animationGroup.repeatCount = INFINITY;
@@ -181,6 +181,7 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
 {
     %orig;
 
+    SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:[self displayIdentifier]];
     [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
 }
 %end
@@ -282,8 +283,11 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
     
     NSString *id = arg1.sectionID;
     SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:id];
-    SBIconView *view = [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
-    updateGlowView(view, YES);
+    if (icon)
+    {
+        SBIconView *view = [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
+        updateGlowView(view, YES);
+    }
 }
 %end
 
