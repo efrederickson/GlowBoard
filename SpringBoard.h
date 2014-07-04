@@ -304,5 +304,18 @@
 - (void)setIcon:(id)arg1 animated:(_Bool)arg2;
 - (void)dealloc;
 - (id)initWithFrame:(struct CGRect)arg1;
-
 @end
+
+@interface BBBulletin
+@property(copy, nonatomic) NSString *bulletinID; // @synthesize bulletinID=_bulletinID;
+@property(copy, nonatomic) NSString *sectionID; // @synthesize sectionID=_sectionID;
+@property(copy, nonatomic) NSString *section;
+@property(copy, nonatomic) NSString *message;
+@property(copy, nonatomic) NSString *subtitle;
+@property(copy, nonatomic) NSString *title;
+@end
+
+@interface BBServer
+- (void)publishBulletin:(id)arg1 destinations:(unsigned long long)arg2 alwaysToLockScreen:(_Bool)arg3;
+@end
+

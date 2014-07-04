@@ -1,4 +1,4 @@
 #import <UIKit/UIImage.h>
-@interface UIImage (UIImageAverageColorAddition)
+@interface UIImage (AverageColor)
 - (UIColor *)averageColor;
 @end

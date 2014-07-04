@@ -82,7 +82,7 @@ void reloadSettings(CFNotificationCenterRef center,
         badgedColorMode = 2;
 }
 
-void updateGlowView(SBIconView *v)
+void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
 {
     if (((SpringBoard *)[UIApplication sharedApplication]).isLocked)
         return;
@@ -119,11 +119,8 @@ void updateGlowView(SBIconView *v)
     v._iconImageView.layer.shadowPath = [UIBezierPath bezierPathWithRect:v._iconImageView.layer.bounds].CGPath;
     v._iconImageView.layer.shadowColor = [UIColor whiteColor].CGColor;
 
-    //v._iconImageView.layer.rasterizationScale = [[UIScreen mainScreen] scale];
-    //v._iconImageView.layer.shouldRasterize = YES;
-
     // grow animation for a badge
-    if (v.icon.badgeValue > 0 && animateNotifications)
+    if ((v.icon.badgeValue > 0 || forceNotif) && animateNotifications)
     {
         if ([v.layer animationForKey:kGB_NotifAnimKey] != nil)
             return;
@@ -144,7 +141,6 @@ void updateGlowView(SBIconView *v)
         if ([v isInDock] && bounceDock)
         {
             // https://github.com/Cocoanetics/Examples/blob/master/IconBouncing/bouncetest/CAKeyFrameAnimation%2BJumping.m#L59-L83
-                
             CGFloat factors[36] = {0, 32, 60, 83, 100, 114, 124, 128, 128, 124, 114, 100, 83, 60, 32, 0, 
                                    24, 46, 60, 66, 70, 66, 60, 46, 24, 0, 
                                    18, 28, 32, 28, 18, 0, 
@@ -152,7 +148,6 @@ void updateGlowView(SBIconView *v)
 
 
             NSMutableArray *values = [NSMutableArray array];
-
             int iconHeight = 80;
 
             for (int i=0; i<36; i++)
@@ -181,38 +176,12 @@ void updateGlowView(SBIconView *v)
     }
 }
 
-void ApplicationLaunched(SBApplication *application)
-{
-    if (!enabled)
-        return;
-
-	SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:[application displayIdentifier]];
-	if (icon) 
-    {
-		[[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
-	}
-}
-
-void ApplicationDied(SBApplication *application)
-{
-    if (!enabled)
-        return;
-
-	SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:[application displayIdentifier]];
-	if (icon) {
-		[[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
-	}
-}
-
 %hook SBApplication
 - (void)setRunning:(_Bool)arg1
 {
     %orig;
 
-    if (arg1)
-        ApplicationLaunched(self);
-    else
-        ApplicationDied(self);
+    [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
 }
 %end
 
@@ -275,12 +244,17 @@ void ApplicationDied(SBApplication *application)
 }
 %end
 
+// Required for A U X O 2 to work, right now. 
 %hook CALayer
 -(CGColorRef) shadowColor
 {
     if ([self.delegate isKindOfClass:[%c(SBIconImageView) class]])
     {
-        int color = (((SBIconImageView*)self.delegate).icon.application.isRunning ? activeColorMode : badgedColorMode);
+        SBIconImageView *view = (SBIconImageView*)self.delegate;
+        if ((view.icon.application.isRunning == NO && view.icon.badgeValue == 0) || [suppressedIcons containsObject:view.icon])
+            return %orig;
+        
+        int color = view.icon.application.isRunning ? activeColorMode : badgedColorMode;
         UIColor *c = [UIColor whiteColor];
         if (color == 0)
             c = [UIColor whiteColor];
@@ -298,6 +272,18 @@ void ApplicationDied(SBApplication *application)
         return c.CGColor;
     }
     return %orig;
+}
+%end
+
+%hook BBServer
+- (void)publishBulletin:(BBBulletin*)arg1 destinations:(unsigned long long)arg2 alwaysToLockScreen:(_Bool)arg3
+{
+    %orig;
+    
+    NSString *id = arg1.sectionID;
+    SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:id];
+    SBIconView *view = [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
+    updateGlowView(view, YES);
 }
 %end
 
