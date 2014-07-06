@@ -89,7 +89,12 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     //if (((SpringBoard *)[UIApplication sharedApplication]).isLocked)
     //    return;
 
-    if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0 && [ncIcons containsObject:v.icon] == NO) || ([suppressedIcons containsObject:v.icon] && isSwitcher == NO) || enabled == NO || ([v isKindOfClass:[%c(SBFolderIconView) class]] && glowFolders == NO) || (glowDock == NO && [v isInDock]))
+    if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0 && [ncIcons containsObject:v.icon] == NO) 
+    || ([suppressedIcons containsObject:v.icon] && isSwitcher == NO) 
+    || enabled == NO 
+    || ([v isKindOfClass:[%c(SBFolderIconView) class]] && glowFolders == NO) 
+    || (glowDock == NO && [v isInDock])
+    || (isSwitcher == YES && showInSwitcher == NO))
     {
         [v._iconImageView.layer removeAnimationForKey:kGB_PulseAnimKey];
         [v.layer removeAnimationForKey:kGB_NotifAnimKey];
@@ -191,15 +196,13 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
 {
 	%orig;
 
-	if (showInSwitcher || self == [%c(SBIconViewMap) homescreenMap])
-    {
-        updateGlowView(iconView, NO, self != [%c(SBIconViewMap) homescreenMap]);
-    }
+    updateGlowView(iconView, NO, self != [%c(SBIconViewMap) homescreenMap]);
 }
 
 - (id)mappedIconViewForIcon:(id)arg1
 {
     SBIconView *iconView = %orig;
+
     updateGlowView(iconView, NO, self != [%c(SBIconViewMap) homescreenMap]);
     return iconView;
 }
