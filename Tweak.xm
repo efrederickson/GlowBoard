@@ -206,6 +206,17 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     updateGlowView(iconView, NO, self != [%c(SBIconViewMap) homescreenMap]);
     return iconView;
 }
+
+- (void)iconViewDidChangeLocation:(SBIconView*)arg1
+{
+    %orig;
+    
+    [arg1._iconImageView.layer removeAnimationForKey:kGB_PulseAnimKey];
+    [arg1.layer removeAnimationForKey:kGB_NotifAnimKey];
+    arg1._iconImageView.layer.shadowOpacity = 0;
+    updateGlowView(arg1);
+}
+
 %end
 
 %hook SBIcon

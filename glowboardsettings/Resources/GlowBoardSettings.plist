@@ -12,24 +12,6 @@
 			<key>defaults</key>
 			<string>com.efrederickson.glowboard.settings</string>
 			<key>key</key>
-			<string>enabled</string>
-			<key>label</key>
-			<string>Enabled</string>
-			<key>PostNotification</key>
-			<string>com.efrederickson.glowboard/reloadSettings</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.efrederickson.glowboard.settings</string>
-			<key>key</key>
 			<string>showInSwitcher</string>
 			<key>label</key>
 			<string>Show in Switcher</string>
@@ -169,12 +151,6 @@
 				<string>4</string>
 				<string>5</string>
 			</array>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>Copyright 2014 Elijah Frederickson.</string>
 		</dict>
 	</array>
 	<key>title</key>
