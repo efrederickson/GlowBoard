@@ -126,7 +126,6 @@
 				<string>White</string>
 				<string>Light White</string>
 				<string>Red</string>
-				<string>b</string>
 				<string>Dark</string>
 				<string>Adaptive</string>
 			</array>
@@ -135,7 +134,6 @@
 				<integer>0</integer>
 				<integer>1</integer>
 				<integer>2</integer>
-				<integer>3</integer>
 				<string>4</string>
 				<string>5</string>
 			</array>
@@ -160,7 +158,6 @@
 				<string>White</string>
 				<string>Light White</string>
 				<string>Red</string>
-				<string>b</string>
 				<string>Dark</string>
 				<string>Adaptive</string>
 			</array>
@@ -169,7 +166,6 @@
 				<integer>0</integer>
 				<integer>1</integer>
 				<integer>2</integer>
-				<integer>3</integer>
 				<string>4</string>
 				<string>5</string>
 			</array>
