@@ -116,7 +116,7 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     }
 
     v._iconImageView.layer.shadowOpacity = 1;
-    v._iconImageView.layer.shadowRadius = 10;
+    v._iconImageView.layer.shadowRadius = 13;
     v._iconImageView.layer.shadowPath = [UIBezierPath bezierPathWithRect:v._iconImageView.layer.bounds].CGPath;
     v._iconImageView.layer.shadowColor = [UIColor orangeColor].CGColor; // This is handled later in the CALayer hook
 
@@ -269,9 +269,9 @@ BOOL oldAnimNotifs;
         if (color == 0)
             c = [UIColor whiteColor];
         else if (color == 1)
-            c = [UIColor greenColor];
+            c = [UIColor colorWithWhite:1.0 alpha:0.6];
         else if (color == 2)
-            c = [UIColor redColor];
+            c = [UIColor colorWithRed:184/255.0f green:36/255.0f blue:36/255.0f alpha:1.0f];    //[UIColor redColor];
         else if (color == 3)
             c = [UIColor blueColor];
         else if (color == 4)

@@ -124,7 +124,7 @@
 			<key>validTitles</key>
 			<array>
 				<string>White</string>
-				<string>g</string>
+				<string>Light White</string>
 				<string>Red</string>
 				<string>b</string>
 				<string>Dark</string>
@@ -158,7 +158,7 @@
 			<key>validTitles</key>
 			<array>
 				<string>White</string>
-				<string>g</string>
+				<string>Light White</string>
 				<string>Red</string>
 				<string>b</string>
 				<string>Dark</string>
