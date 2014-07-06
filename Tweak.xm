@@ -9,13 +9,15 @@ struct STKGroupSlot { // Apex 2
     unsigned long long index;
 };
 #import <UIKit/UIScreen.h>
+#import <substrate.h>
 
 #define RILog(fmt, ...) NSLog((@"[GlowBoard] " fmt), ##__VA_ARGS__)
 
 #define kGB_NotifAnimKey @"GB_NotifAnimKey"
 #define kGB_PulseAnimKey @"GB_PulseAnimKey"
 
-NSMutableSet *suppressedIcons;
+NSMutableSet *suppressedIcons; // Used for Apex 2 compatibility
+NSMutableSet *ncIcons = [[NSMutableSet alloc] init];
 
 BOOL enabled = YES;
 BOOL showInSwitcher = YES;
@@ -82,12 +84,12 @@ void reloadSettings(CFNotificationCenterRef center,
         badgedColorMode = 2;
 }
 
-void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
+void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
 {
     //if (((SpringBoard *)[UIApplication sharedApplication]).isLocked)
     //    return;
 
-    if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0) || [suppressedIcons containsObject:v.icon] || enabled == NO || ([v isKindOfClass:[%c(SBFolderIconView) class]] && glowFolders == NO) || (glowDock == NO && [v isInDock]))
+    if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0 && [ncIcons containsObject:v.icon] == NO) || ([suppressedIcons containsObject:v.icon] && isSwitcher == NO) || enabled == NO || ([v isKindOfClass:[%c(SBFolderIconView) class]] && glowFolders == NO) || (glowDock == NO && [v isInDock]))
     {
         [v._iconImageView.layer removeAnimationForKey:kGB_PulseAnimKey];
         [v.layer removeAnimationForKey:kGB_NotifAnimKey];
@@ -98,7 +100,6 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
     // pulse animation (for badge/running)
     if ([v._iconImageView.layer animationForKey:kGB_PulseAnimKey] == nil && animateGlow)
     {
-        [v._iconImageView.layer removeAnimationForKey:kGB_PulseAnimKey]; // ... its already nil ...
         CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
         animation.fromValue = @.2;
         animation.toValue = @1;
@@ -117,15 +118,14 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
     v._iconImageView.layer.shadowOpacity = 1;
     v._iconImageView.layer.shadowRadius = 10;
     v._iconImageView.layer.shadowPath = [UIBezierPath bezierPathWithRect:v._iconImageView.layer.bounds].CGPath;
-    v._iconImageView.layer.shadowColor = [UIColor whiteColor].CGColor; // This is handled later in the CALayer hook
+    v._iconImageView.layer.shadowColor = [UIColor orangeColor].CGColor; // This is handled later in the CALayer hook
 
     // grow animation for a badge
-    if ((v.icon.badgeValue > 0 || forceNotif) && animateNotifications)
+    if ((v.icon.badgeValue > 0 || [ncIcons containsObject:v.icon] || forceNotif) && animateNotifications)
     {
         if ([v.layer animationForKey:kGB_NotifAnimKey] != nil)
             return;
 
-        [v.layer removeAnimationForKey:kGB_NotifAnimKey]; // ... same here its already nil ...
         CAAnimationGroup *animationGroup = [CAAnimationGroup animation];
         animationGroup.duration = 3.5;
         animationGroup.repeatCount = INFINITY;
@@ -193,14 +193,14 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
 
 	if (showInSwitcher || self == [%c(SBIconViewMap) homescreenMap])
     {
-        updateGlowView(iconView);
+        updateGlowView(iconView, NO, self != [%c(SBIconViewMap) homescreenMap]);
     }
 }
 
 - (id)mappedIconViewForIcon:(id)arg1
 {
     SBIconView *iconView = %orig;
-    updateGlowView(iconView);
+    updateGlowView(iconView, NO, self != [%c(SBIconViewMap) homescreenMap]);
     return iconView;
 }
 %end
@@ -215,6 +215,7 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
 %end
 
 // APEX 2
+BOOL oldAnimNotifs;
 %hook STKGroupView
 - (void)_animateOpenWithCompletion:(id)arg1
 { 
@@ -228,6 +229,10 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
             updateGlowView(view);
         }
     }
+
+    oldAnimNotifs = animateNotifications; animateNotifications = NO;
+    SBIconView *center = MSHookIvar<SBIconView*>(self, "_centralIconView");
+    updateGlowView(center);
 }
 
 - (void)_animateClosedWithCompletion:(id)arg1
@@ -242,6 +247,10 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
             updateGlowView(view);
         }
     }
+
+    animateNotifications = oldAnimNotifs;
+    SBIconView *center = MSHookIvar<SBIconView*>(self, "_centralIconView");
+    updateGlowView(center);
 }
 %end
 
@@ -252,7 +261,7 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
     if ([self.delegate isKindOfClass:[%c(SBIconImageView) class]])
     {
         SBIconImageView *view = (SBIconImageView*)self.delegate;
-        if ((view.icon.application.isRunning == NO && view.icon.badgeValue == 0) || [suppressedIcons containsObject:view.icon])
+        if ((view.icon.application.isRunning == NO && view.icon.badgeValue == 0 && [ncIcons containsObject:view.icon] == NO))
             return %orig;
         
         int color = view.icon.application.isRunning ? activeColorMode : badgedColorMode;
@@ -280,13 +289,39 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO)
 - (void)publishBulletin:(BBBulletin*)arg1 destinations:(unsigned long long)arg2 alwaysToLockScreen:(_Bool)arg3
 {
     %orig;
-    
+
     NSString *id = arg1.sectionID;
     SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:id];
     if (icon)
     {
         SBIconView *view = [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
-        updateGlowView(view, YES);
+        [ncIcons addObject:icon];
+        updateGlowView(view);
+    }
+}
+
+
+- (void)_sendRemoveBulletins:(NSSet*)arg1 toFeeds:(unsigned long long)arg2 shouldSync:(_Bool)arg3
+{
+    %orig;
+    
+    RILog(@"_sendRemoveBulletin<s>: %@", arg1);
+
+    BBBulletin *bulletin = [arg1 anyObject];
+    if (!bulletin)
+        return;
+
+    NSString *section = bulletin.sectionID;
+
+    NSArray *bulletins = [self noticesBulletinIDsForSectionID:section];
+    SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:section];
+    
+    RILog(@"bulletins: %@", bulletins);
+
+    if (bulletins.count == 0 && icon)
+    {
+        [ncIcons removeObject:icon];
+        [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
     }
 }
 %end

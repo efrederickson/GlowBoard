@@ -317,5 +317,10 @@
 
 @interface BBServer
 - (void)publishBulletin:(id)arg1 destinations:(unsigned long long)arg2 alwaysToLockScreen:(_Bool)arg3;
+- (id)_allBulletinsForSectionID:(id)arg1;
+
+- (id)allBulletinIDsForSectionID:(id)arg1;
+- (id)noticesBulletinIDsForSectionID:(id)arg1;
+- (id)bulletinIDsForSectionID:(id)arg1 inFeed:(unsigned long long)arg2;
 @end
 
