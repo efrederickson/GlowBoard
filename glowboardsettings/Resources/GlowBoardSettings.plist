@@ -56,7 +56,7 @@
 			<key>key</key>
 			<string>animateNotifications</string>
 			<key>label</key>
-			<string>Animate Badged Icons</string>
+			<string>Animate Notifications</string>
 			<key>PostNotification</key>
 			<string>com.efrederickson.glowboard/reloadSettings</string>
 		</dict>
@@ -132,7 +132,7 @@
 			<key>key</key>
 			<string>badgedColor</string>
 			<key>label</key>
-			<string>Badged Color</string>
+			<string>Notification Color</string>
 			<key>PostNotification</key>
 			<string>com.efrederickson.glowboard/reloadSettings</string>
 			<key>validTitles</key>
