@@ -9,6 +9,6 @@ include $(THEOS)/makefiles/common.mk
 include $(THEOS)/makefiles/tweak.mk
 
 after-install::
-	install.exec "killall -9 SpringBoard"
+	install.exec "killall -9 Preferences"
 SUBPROJECTS += glowboardsettings
 include $(THEOS_MAKE_PATH)/aggregate.mk

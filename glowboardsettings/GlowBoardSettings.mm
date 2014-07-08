@@ -36,7 +36,7 @@
 -(NSString*) headerText { return @"GlowBoard"; }
 -(NSString*) headerSubText { return @"Give your icons a heavenly glow"; }
 
--(NSString*) customTitle { return @"GlowBoard"; }
+-(NSString*) customTitle { return @""; }
 -(NSString*) plistName { return @"GlowBoardSettings"; }
 
 -(NSString*)postNotification { return @"com.efrederickson.glowboard/reloadSettings"; }
@@ -46,16 +46,21 @@
 -(NSString*) emailSubject { return @"GlowBoard"; }
 -(NSString*) enabledDescription { return @"Quickly enable or disable GlowBoard."; }
 
--(UIColor*) iconColor { return [UIColor blackColor]; }
+-(UIColor*) iconColor { return [UIColor colorWithRed:38/255.0f green:166/255.0f blue:141/255.0f alpha:1.0f]; }
+-(UIColor*) headerColor { return [UIColor colorWithRed:74/255.0f green:74/255.0f blue:74/255.0f alpha:1.0f]; }
+-(UIColor*) heartImageColor { return [UIColor colorWithRed:38/255.0f green:166/255.0f blue:141/255.0f alpha:1.0f]; }
+-(UIColor*) navigationTintColor { return [UIColor colorWithRed:38/255.0f green:166/255.0f blue:141/255.0f alpha:1.0f]; }
+
 
 -(NSString*) settingsListControllerClassName { return @"GBActualSettingsListController"; }
 -(NSString*) makersListControllerClassName { return @"GBMakersListController"; }
 
--(NSString*) footerText { return @"Copyright 2014 Elijah Frederickson"; }
+-(NSString*) footerText { return @"© 2014 Elijah Frederickson"; }
 @end
 
 @implementation GBActualSettingsListController
 -(NSString*) plistName { return @"GlowBoardSettings"; }
+-(NSString*) customTitle { return @"GlowBoard"; }
 -(BOOL) showHeartImage { return NO; }
 @end
 
