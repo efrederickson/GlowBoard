@@ -2,7 +2,7 @@ Package: com.efrederickson.glowboard
 Section: Tweaks
 Architecture: iphoneos-arm
 Version: 0.1
-Description: Running app icons glow
+Description: Give your icons a heavenly glow!
 Name: GlowBoard
 Depends: firmware (>= 4.0), mobilesubstrate, preferenceloader
 Author: Elijah Frederickson <elijah.frederickson@gmail.com>

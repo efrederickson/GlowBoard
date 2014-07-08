@@ -17,6 +17,43 @@
 -(UINavigationController*)navigationController;
 @end
 
+@interface PSListItemsController (GlowBoard)
+- (void)setIsRestrictionList:(BOOL)arg1;
+- (BOOL)isRestrictionList;
+- (id)itemsFromDataSource;
+- (id)itemsFromParent;
+- (void)_addStaticText:(id)arg1;
+- (void)listItemSelected:(id)arg1;
+- (void)setRowToSelect;
+- (void)setValueForSpecifier:(id)arg1 defaultValue:(id)arg2;
+- (void)scrollToSelectedCell;
+- (void)didLock;
+- (void)prepareSpecifiersMetadata;
+- (id)specifiers;
+- (void)dealloc;
+- (void)suspend;
+- (void)viewWillDisappear:(BOOL)arg1;
+- (void)viewWillAppear:(BOOL)arg1;
+- (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2;
+- (void)tableView:(id)arg1 didSelectRowAtIndexPath:(id)arg2;
+@end
+@interface PSTableCell (GLowBoard)
+- (id)titleLabel;
+- (void)setIcon:(id)arg1;
+- (BOOL)isChecked;
+- (id)iconImageView;
+- (void)setType:(int)arg1;
+- (int)type;
+- (id)title;
+- (void)setCellEnabled:(BOOL)arg1;
+- (void)setValue:(id)arg1;
+- (void)setSeparatorStyle:(int)arg1;
+
+- (id)titleTextLabel;
+- (id)value;
+- (UILabel *)valueLabel;
+@end
+
 @interface GBActualSettingsListController : SKTintedListController<SKListControllerProtocol>
 @end
 @interface GBMakersListController : SKTintedListController<SKListControllerProtocol>
@@ -24,6 +61,8 @@
 @interface ElijahPersonCell : SKPersonCell
 @end
 @interface AndrewPersonCell : SKPersonCell
+@end
+@interface GBColorSelectorController : PSListItemsController
 @end
 
 @interface GBSettingsListController: SKStandardController
@@ -62,6 +101,7 @@
 -(NSString*) plistName { return @"GlowBoardSettings"; }
 -(NSString*) customTitle { return @"GlowBoard"; }
 -(BOOL) showHeartImage { return NO; }
+-(UIColor*) navigationTintColor { return [UIColor colorWithRed:38/255.0f green:166/255.0f blue:141/255.0f alpha:1.0f]; }
 @end
 
 @implementation  ElijahPersonCell
@@ -79,6 +119,7 @@
 @end
 
 @implementation GBMakersListController
+-(UIColor*) navigationTintColor { return [UIColor colorWithRed:38/255.0f green:166/255.0f blue:141/255.0f alpha:1.0f]; }
 -(BOOL) showHeartImage { return NO; }
 -(NSString*) customTitle { return @"The Makers"; }
 
@@ -121,5 +162,28 @@
 -(void) openAndrewTwitter
 {
     [SKSharedHelper openTwitter:@"drewplex"];
+}
+@end
+
+@implementation GBColorSelectorController
+- (void)viewWillAppear:(BOOL)animated {
+    self.view.tintColor = [UIColor colorWithRed:38/255.0f green:166/255.0f blue:141/255.0f alpha:1.0f];;
+    self.navigationController.navigationBar.tintColor = [UIColor colorWithRed:38/255.0f green:166/255.0f blue:141/255.0f alpha:1.0f];;
+    
+    [super viewWillAppear:animated];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+	[super viewWillDisappear:animated];
+    
+    self.view.tintColor = nil;
+    self.navigationController.navigationBar.tintColor = nil;
+}
+
+- (id)tableView:(UITableView *)arg1 cellForRowAtIndexPath:(NSIndexPath *)arg2 {
+	PSTableCell *cell = [super tableView:arg1 cellForRowAtIndexPath:arg2];
+	NSString *title = [[cell titleLabel] text];
+	[cell.imageView setImage:[UIImage imageNamed:[title stringByAppendingString:@".png"] inBundle:[NSBundle bundleForClass:self.class]]];
+	return cell;
 }
 @end

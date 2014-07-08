@@ -6,6 +6,40 @@
 	<array>
 		<dict>
 			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Locations</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.efrederickson.glowboard.settings</string>
+			<key>key</key>
+			<string>glowDock</string>
+			<key>label</key>
+			<string>Display on Dock</string>
+			<key>PostNotification</key>
+			<string>com.efrederickson.glowboard/reloadSettings</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.efrederickson.glowboard.settings</string>
+			<key>key</key>
+			<string>glowFolders</string>
+			<key>label</key>
+			<string>Display on Folders</string>
+			<key>PostNotification</key>
+			<string>com.efrederickson.glowboard/reloadSettings</string>
+		</dict>
+		<dict>
+			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
 			<true/>
@@ -14,9 +48,15 @@
 			<key>key</key>
 			<string>showInSwitcher</string>
 			<key>label</key>
-			<string>Show in Switcher</string>
+			<string>Display in Switcher</string>
 			<key>PostNotification</key>
 			<string>com.efrederickson.glowboard/reloadSettings</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Animation</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -40,20 +80,6 @@
 			<key>defaults</key>
 			<string>com.efrederickson.glowboard.settings</string>
 			<key>key</key>
-			<string>glowDock</string>
-			<key>label</key>
-			<string>Animate Dock</string>
-			<key>PostNotification</key>
-			<string>com.efrederickson.glowboard/reloadSettings</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.efrederickson.glowboard.settings</string>
-			<key>key</key>
 			<string>animateNotifications</string>
 			<key>label</key>
 			<string>Animate Notifications</string>
@@ -62,37 +88,15 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<false/>
-			<key>defaults</key>
-			<string>com.efrederickson.glowboard.settings</string>
-			<key>key</key>
-			<string>glowFolders</string>
+			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Animate Folders</string>
-			<key>PostNotification</key>
-			<string>com.efrederickson.glowboard/reloadSettings</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.efrederickson.glowboard.settings</string>
-			<key>key</key>
-			<string>bounceDock</string>
-			<key>label</key>
-			<string>Bounce Dock</string>
-			<key>PostNotification</key>
-			<string>com.efrederickson.glowboard/reloadSettings</string>
+			<string>Colors</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSLinkListCell</string>
 			<key>detail</key>
-			<string>PSListItemsController</string>
+			<string>GBColorSelectorController</string>
 			<key>default</key>
 			<integer>0</integer>
 			<key>defaults</key>
@@ -124,7 +128,7 @@
 			<key>cell</key>
 			<string>PSLinkListCell</string>
 			<key>detail</key>
-			<string>PSListItemsController</string>
+			<string>GBColorSelectorController</string>
 			<key>default</key>
 			<integer>2</integer>
 			<key>defaults</key>
@@ -152,8 +156,28 @@
 				<string>5</string>
 			</array>
 		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Other</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.efrederickson.glowboard.settings</string>
+			<key>key</key>
+			<string>bounceDock</string>
+			<key>label</key>
+			<string>Bounce Dock</string>
+			<key>PostNotification</key>
+			<string>com.efrederickson.glowboard/reloadSettings</string>
+		</dict>
 	</array>
 	<key>title</key>
-	<string>GlowBoard</string>
+	<string>Options</string>
 </dict>
 </plist>
