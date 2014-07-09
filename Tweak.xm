@@ -26,6 +26,7 @@ BOOL animateNotifications = YES;
 BOOL glowFolders = NO;
 BOOL bounceDock = YES;
 BOOL animateGlow = YES;
+BOOL disableNotificationGlow = NO;
 int badgedColorMode = 2;
 int activeColorMode = 0;
 
@@ -82,6 +83,11 @@ void reloadSettings(CFNotificationCenterRef center,
         badgedColorMode = [[prefs objectForKey:@"badgedColor"] intValue];
     else
         badgedColorMode = 2;
+
+    if ([prefs objectForKey:@"disableNotificationGlow"] != nil)
+        disableNotificationGlow = [[prefs objectForKey:@"disableNotificationGlow"] boolValue];
+    else
+        disableNotificationGlow = NO;
 }
 
 void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
@@ -124,6 +130,14 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     v._iconImageView.layer.shadowRadius = 13;
     v._iconImageView.layer.shadowPath = [UIBezierPath bezierPathWithRect:v._iconImageView.layer.bounds].CGPath;
     v._iconImageView.layer.shadowColor = [UIColor orangeColor].CGColor; // This is handled later in the CALayer hook
+    
+    
+    if (!(v.icon.badgeValue == 0 && [ncIcons containsObject:v.icon] == NO) && disableNotificationGlow)
+    {
+        v._iconImageView.layer.shadowOpacity = 0;
+        v._iconImageView.layer.shadowColor = [UIColor clearColor].CGColor;
+        [v._iconImageView.layer removeAnimationForKey:kGB_PulseAnimKey];
+    }
 
     // grow animation for a badge
     if ((v.icon.badgeValue > 0 || [ncIcons containsObject:v.icon] || forceNotif) && animateNotifications)
