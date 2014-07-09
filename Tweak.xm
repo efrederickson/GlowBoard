@@ -27,6 +27,7 @@ BOOL glowFolders = NO;
 BOOL bounceDock = YES;
 BOOL animateGlow = YES;
 BOOL disableNotificationGlow = NO;
+BOOL requireBadge = NO;
 int badgedColorMode = 2;
 int activeColorMode = 0;
 
@@ -88,6 +89,11 @@ void reloadSettings(CFNotificationCenterRef center,
         disableNotificationGlow = [[prefs objectForKey:@"disableNotificationGlow"] boolValue];
     else
         disableNotificationGlow = NO;
+
+    if ([prefs objectForKey:@"requireBadge"] != nil)
+        requireBadge = [[prefs objectForKey:@"requireBadge"] boolValue];
+    else
+        requireBadge = NO;
 }
 
 void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
@@ -317,6 +323,9 @@ BOOL oldAnimNotifs;
 - (void)publishBulletin:(BBBulletin*)arg1 destinations:(unsigned long long)arg2 alwaysToLockScreen:(_Bool)arg3
 {
     %orig;
+    
+    if (requireBadge)
+        return;
 
     NSString *id = arg1.sectionID;
     SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:id];
@@ -332,6 +341,9 @@ BOOL oldAnimNotifs;
 - (void)_sendRemoveBulletins:(NSSet*)arg1 toFeeds:(unsigned long long)arg2 shouldSync:(_Bool)arg3
 {
     %orig;
+    
+    if (requireBadge)
+        return;
     
     RILog(@"_sendRemoveBulletin<s>: %@", arg1);
 

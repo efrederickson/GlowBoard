@@ -175,6 +175,9 @@
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Other</string>
+
+			<key>footerText</key>
+			<string>* requires a respring</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -187,6 +190,20 @@
 			<string>bounceDock</string>
 			<key>label</key>
 			<string>Bounce Dock</string>
+			<key>PostNotification</key>
+			<string>com.efrederickson.glowboard/reloadSettings</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.efrederickson.glowboard.settings</string>
+			<key>key</key>
+			<string>requireBadge</string>
+			<key>label</key>
+			<string>Require Badge for Notification*</string>
 			<key>PostNotification</key>
 			<string>com.efrederickson.glowboard/reloadSettings</string>
 		</dict>
