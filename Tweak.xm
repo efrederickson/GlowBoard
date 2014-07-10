@@ -27,6 +27,7 @@ BOOL glowFolders = NO;
 BOOL bounceDock = YES;
 BOOL animateGlow = YES;
 BOOL disableNotificationGlow = NO;
+BOOL disableRunningGlow = NO;
 BOOL requireBadge = NO;
 int badgedColorMode = 2;
 int activeColorMode = 0;
@@ -94,6 +95,11 @@ void reloadSettings(CFNotificationCenterRef center,
         requireBadge = [[prefs objectForKey:@"requireBadge"] boolValue];
     else
         requireBadge = NO;
+
+    if ([prefs objectForKey:@"disableRunningGlow"] != nil)
+        disableRunningGlow = [[prefs objectForKey:@"disableRunningGlow"] boolValue];
+    else
+        disableRunningGlow = NO;
 }
 
 void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
@@ -138,7 +144,8 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     v._iconImageView.layer.shadowColor = [UIColor orangeColor].CGColor; // This is handled later in the CALayer hook
     
     
-    if (!(v.icon.badgeValue == 0 && [ncIcons containsObject:v.icon] == NO) && disableNotificationGlow)
+    if (((v.icon.badgeValue != 0 || [ncIcons containsObject:v.icon]) && disableNotificationGlow)
+    || (v.icon.application.isRunning && disableRunningGlow))
     {
         v._iconImageView.layer.shadowOpacity = 0;
         v._iconImageView.layer.shadowColor = [UIColor clearColor].CGColor;
