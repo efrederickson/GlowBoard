@@ -32,6 +32,8 @@ BOOL requireBadge = NO;
 int badgedColorMode = 2;
 int activeColorMode = 0;
 NSDictionary *blacklist = [[NSDictionary dictionary] retain];
+BOOL disableUpdateGlow = NO;
+int updatedColorMode = 3;
 
 void reloadSettings(CFNotificationCenterRef center,
                                     void *observer,
@@ -101,7 +103,17 @@ void reloadSettings(CFNotificationCenterRef center,
         disableRunningGlow = [[prefs objectForKey:@"disableRunningGlow"] boolValue];
     else
         disableRunningGlow = NO;
-        
+
+    if ([prefs objectForKey:@"disableUpdateGlow"] != nil)
+        disableUpdateGlow = [[prefs objectForKey:@"disableUpdateGlow"] boolValue];
+    else
+        disableUpdateGlow = NO;
+
+    if ([prefs objectForKey:@"updatedColor"] != nil)
+        updatedColorMode = [[prefs objectForKey:@"updatedColor"] intValue];
+    else
+        updatedColorMode = 3;
+
     blacklist = [[NSDictionary
         dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.efrederickson.glowboard.settings.plist"] retain];
 }
@@ -117,13 +129,14 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     if (blacklist != nil && identifier != nil && [[blacklist objectForKey: [prefix stringByAppendingString:identifier]] boolValue])
         isBlacklisted = YES;
 
-    if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0 && [ncIcons containsObject:v.icon] == NO) 
+    if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0 && [ncIcons containsObject:v.icon] == NO && v.icon.application._isRecentlyUpdated == NO && v.icon.application._isNewlyInstalled == NO)
     || ([suppressedIcons containsObject:v.icon] && isSwitcher == NO) 
     || enabled == NO 
     || ([v isKindOfClass:[%c(SBFolderIconView) class]] && glowFolders == NO) 
     || (glowDock == NO && [v isInDock])
     || (isSwitcher == YES && showInSwitcher == NO)
-    || isBlacklisted)
+    || isBlacklisted
+    )
     {
         [v._iconImageView.layer removeAnimationForKey:kGB_PulseAnimKey];
         [v.layer removeAnimationForKey:kGB_NotifAnimKey];
@@ -227,6 +240,22 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:[self displayIdentifier]];
     [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
 }
+
+- (void)markRecentlyUpdated
+{
+    %orig;
+
+    SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:[self displayIdentifier]];
+    [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
+}
+
+- (void)markNewlyInstalled
+{
+    %orig;
+
+    SBIcon *icon = [[[%c(SBIconViewMap) homescreenMap] iconModel] applicationIconForDisplayIdentifier:[self displayIdentifier]];
+    [[%c(SBIconViewMap) homescreenMap] mappedIconViewForIcon:icon];
+}
 %end
 
 %hook SBIconViewMap
@@ -313,10 +342,12 @@ BOOL oldAnimNotifs;
     if ([self.delegate isKindOfClass:[%c(SBIconImageView) class]])
     {
         SBIconImageView *view = (SBIconImageView*)self.delegate;
-        if ((view.icon.application.isRunning == NO && view.icon.badgeValue == 0 && [ncIcons containsObject:view.icon] == NO))
+        if ((view.icon.application.isRunning == NO && view.icon.badgeValue == 0 && [ncIcons containsObject:view.icon] == NO) && view.icon.application._isRecentlyUpdated == NO && view.icon.application._isNewlyInstalled == NO)
             return %orig;
         
-        int color = view.icon.application.isRunning ? activeColorMode : badgedColorMode;
+        BOOL isUpdated = disableUpdateGlow == NO && (view.icon.application._isRecentlyUpdated || view.icon.application._isNewlyInstalled);
+
+        int color = view.icon.application.isRunning ? activeColorMode : (isUpdated ? updatedColorMode : badgedColorMode);
         UIColor *c = [UIColor whiteColor];
         if (color == 0)
             c = [UIColor whiteColor];
@@ -325,7 +356,7 @@ BOOL oldAnimNotifs;
         else if (color == 2)
             c = [UIColor colorWithRed:184/255.0f green:36/255.0f blue:36/255.0f alpha:1.0f];    //[UIColor redColor];
         else if (color == 3)
-            c = [UIColor blueColor];
+            c = [UIColor purpleColor];
         else if (color == 4)
             c = [UIColor blackColor];
         else if (color == 5)

@@ -234,6 +234,8 @@
 - (BOOL)isRunning;
 - (id)badgeNumberOrString;
 - (NSString*)bundleIdentifier;
+- (_Bool)_isRecentlyUpdated;
+- (_Bool)_isNewlyInstalled;
 @end
 
 @interface SBIconBlurryBackgroundView : UIView
