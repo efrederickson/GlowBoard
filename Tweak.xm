@@ -356,7 +356,8 @@ BOOL oldAnimNotifs;
         else if (color == 2)
             c = [UIColor colorWithRed:184/255.0f green:36/255.0f blue:36/255.0f alpha:1.0f];    //[UIColor redColor];
         else if (color == 3)
-            c = [UIColor purpleColor];
+            c = [UIColor colorWithRed:204/255.0f green:0/255.0f blue:255/255.0f alpha:1.0f];
+            //[UIColor colorWithRed:125/255.0f green:38/255.0f blue:205/255.0f alpha:1.0f];
         else if (color == 4)
             c = [UIColor blackColor];
         else if (color == 5)
