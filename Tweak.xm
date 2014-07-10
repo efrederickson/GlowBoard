@@ -28,7 +28,7 @@ BOOL bounceDock = YES;
 BOOL animateGlow = YES;
 BOOL disableNotificationGlow = NO;
 BOOL disableRunningGlow = NO;
-BOOL requireBadge = NO;
+BOOL requireBadge = YES;
 int badgedColorMode = 2;
 int activeColorMode = 0;
 NSDictionary *blacklist = [[NSDictionary dictionary] retain];
@@ -97,7 +97,7 @@ void reloadSettings(CFNotificationCenterRef center,
     if ([prefs objectForKey:@"requireBadge"] != nil)
         requireBadge = [[prefs objectForKey:@"requireBadge"] boolValue];
     else
-        requireBadge = NO;
+        requireBadge = YES;
 
     if ([prefs objectForKey:@"disableRunningGlow"] != nil)
         disableRunningGlow = [[prefs objectForKey:@"disableRunningGlow"] boolValue];
@@ -169,7 +169,9 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     
     
     if (((v.icon.badgeValue != 0 || [ncIcons containsObject:v.icon]) && disableNotificationGlow)
-    || (v.icon.application.isRunning && disableRunningGlow))
+    || (v.icon.application.isRunning && disableRunningGlow)
+    || ((v.icon.application._isRecentlyUpdated || v.icon.application._isNewlyInstalled) && disableUpdateGlow)
+    )
     {
         v._iconImageView.layer.shadowOpacity = 0;
         v._iconImageView.layer.shadowColor = [UIColor clearColor].CGColor;
@@ -349,18 +351,23 @@ BOOL oldAnimNotifs;
 
         int color = view.icon.application.isRunning ? activeColorMode : (isUpdated ? updatedColorMode : badgedColorMode);
         UIColor *c = [UIColor whiteColor];
-        if (color == 0)
+        if (color == 0) // WHITE
             c = [UIColor whiteColor];
-        else if (color == 1)
+        else if (color == 1) // LIGHT WHITE
             c = [UIColor colorWithWhite:1.0 alpha:0.6];
-        else if (color == 2)
-            c = [UIColor colorWithRed:184/255.0f green:36/255.0f blue:36/255.0f alpha:1.0f];    //[UIColor redColor];
-        else if (color == 3)
+        else if (color == 2) // RED
+            c = [UIColor redColor];     //[UIColor colorWithRed:184/255.0f green:36/255.0f blue:36/255.0f alpha:1.0f];
+        else if (color == 3) // PURPLE
             c = [UIColor colorWithRed:204/255.0f green:0/255.0f blue:255/255.0f alpha:1.0f];
-            //[UIColor colorWithRed:125/255.0f green:38/255.0f blue:205/255.0f alpha:1.0f];
-        else if (color == 4)
+        else if (color == 4) // GREEN
+            c = [UIColor colorWithRed:55/255.0f green:243/255.0f blue:126/255.0f alpha:1.0f];
+        else if (color == 5) // BLUE
+            c = [UIColor colorWithRed:55/255.0f green:188/255.0f blue:243/255.0f alpha:1.0f];
+        else if (color == 6) // LIME
+            c = [UIColor colorWithRed:188/255.0f green:243/255.0f blue:55/255.0f alpha:1.0f];
+        else if (color == 7) // DARK
             c = [UIColor blackColor];
-        else if (color == 5)
+        else if (color == 8) // ADAPTIVE
             c = [((SBIconImageView*)self.delegate).contentsImage averageColor];
 
         return c.CGColor;

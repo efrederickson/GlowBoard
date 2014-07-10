@@ -71,7 +71,7 @@
 -(BOOL) showHeartImage { return YES; }
 -(BOOL) tintNavigationTitleText { return NO; }
 -(BOOL) shiftHeartImage { return YES; }
--(NSString*) shareMessage { return @"I’m loving #GlowBoard!"; }
+-(NSString*) shareMessage { return @"I’m loving #GlowBoard by @daementor!"; }
 -(NSString*) headerText { return @"GlowBoard"; }
 -(NSString*) headerSubText { return @"Give your icons a heavenly glow"; }
 
@@ -94,7 +94,7 @@
 -(NSString*) settingsListControllerClassName { return @"GBActualSettingsListController"; }
 -(NSString*) makersListControllerClassName { return @"GBMakersListController"; }
 
--(NSString*) footerText { return @"© 2014 Elijah Frederickson"; }
+-(NSString*) footerText { return @"© 2014 Elijah Frederickson & Andrew Abosh"; }
 @end
 
 @implementation GBActualSettingsListController

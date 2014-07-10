@@ -154,6 +154,10 @@
 				<string>White</string>
 				<string>Light White</string>
 				<string>Red</string>
+				<string>Purple</string>
+				<string>Green</string>
+				<string>Blue</string>
+				<string>Lime</string>
 				<string>Dark</string>
 				<string>Adaptive</string>
 			</array>
@@ -162,8 +166,12 @@
 				<integer>0</integer>
 				<integer>1</integer>
 				<integer>2</integer>
-				<string>4</string>
-				<string>5</string>
+				<integer>3</integer>
+				<integer>4</integer>
+				<integer>5</integer>
+				<integer>6</integer>
+				<integer>7</integer>
+				<integer>8</integer>
 			</array>
 		</dict>
 		<dict>
@@ -186,6 +194,10 @@
 				<string>White</string>
 				<string>Light White</string>
 				<string>Red</string>
+				<string>Purple</string>
+				<string>Green</string>
+				<string>Blue</string>
+				<string>Lime</string>
 				<string>Dark</string>
 				<string>Adaptive</string>
 			</array>
@@ -194,8 +206,12 @@
 				<integer>0</integer>
 				<integer>1</integer>
 				<integer>2</integer>
-				<string>4</string>
-				<string>5</string>
+				<integer>3</integer>
+				<integer>4</integer>
+				<integer>5</integer>
+				<integer>6</integer>
+				<integer>7</integer>
+				<integer>8</integer>
 			</array>
 		</dict>
 		<dict>
@@ -219,6 +235,9 @@
 				<string>Light White</string>
 				<string>Red</string>
 				<string>Purple</string>
+				<string>Green</string>
+				<string>Blue</string>
+				<string>Lime</string>
 				<string>Dark</string>
 				<string>Adaptive</string>
 			</array>
@@ -227,20 +246,23 @@
 				<integer>0</integer>
 				<integer>1</integer>
 				<integer>2</integer>
-				<string>3</string>
-				<string>4</string>
-				<string>5</string>
+				<integer>3</integer>
+				<integer>4</integer>
+				<integer>5</integer>
+				<integer>6</integer>
+				<integer>7</integer>
+				<integer>8</integer>
 			</array>
 		</dict>
-
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Other</string>
-
 			<key>footerText</key>
-			<string>* Requires a Respring. May fix bouncing/pulsing even after notifications and badges are cleared.</string>
+			<string>* Requires a Respring. May fix bouncing/pulsing even after notifications and badges are cleared.
+
+**Applications such as Mail will always be glowing due to the fact they always run in the background regardless of the circumstance.</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -260,7 +282,7 @@
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
-			<false/>
+			<true/>
 			<key>defaults</key>
 			<string>com.efrederickson.glowboard.settings</string>
 			<key>key</key>
