@@ -31,6 +31,7 @@ BOOL disableRunningGlow = NO;
 BOOL requireBadge = NO;
 int badgedColorMode = 2;
 int activeColorMode = 0;
+NSDictionary *blacklist = [[NSDictionary dictionary] retain];
 
 void reloadSettings(CFNotificationCenterRef center,
                                     void *observer,
@@ -100,19 +101,29 @@ void reloadSettings(CFNotificationCenterRef center,
         disableRunningGlow = [[prefs objectForKey:@"disableRunningGlow"] boolValue];
     else
         disableRunningGlow = NO;
+        
+    blacklist = [[NSDictionary
+        dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.efrederickson.glowboard.settings.plist"] retain];
 }
 
 void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
 {
     //if (((SpringBoard *)[UIApplication sharedApplication]).isLocked)
     //    return;
+    
+    BOOL isBlacklisted = NO;
+    NSString *prefix = @"Blacklist-";
+    NSString *identifier = v.icon.applicationBundleID;
+    if (blacklist != nil && identifier != nil && [[blacklist objectForKey: [prefix stringByAppendingString:identifier]] boolValue])
+        isBlacklisted = YES;
 
     if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0 && [ncIcons containsObject:v.icon] == NO) 
     || ([suppressedIcons containsObject:v.icon] && isSwitcher == NO) 
     || enabled == NO 
     || ([v isKindOfClass:[%c(SBFolderIconView) class]] && glowFolders == NO) 
     || (glowDock == NO && [v isInDock])
-    || (isSwitcher == YES && showInSwitcher == NO))
+    || (isSwitcher == YES && showInSwitcher == NO)
+    || isBlacklisted)
     {
         [v._iconImageView.layer removeAnimationForKey:kGB_PulseAnimKey];
         [v.layer removeAnimationForKey:kGB_NotifAnimKey];

@@ -21,6 +21,7 @@
 - (long long)badgeValue;
 - (id)leafIdentifier;
 - (SBApplication*)application;
+- (NSString*)applicationBundleID;
 @end
 
 @interface SBIconController (iOS40)
@@ -232,6 +233,7 @@
 @interface SBApplication (iOS6)
 - (BOOL)isRunning;
 - (id)badgeNumberOrString;
+- (NSString*)bundleIdentifier;
 @end
 
 @interface SBIconBlurryBackgroundView : UIView

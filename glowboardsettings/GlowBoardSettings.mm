@@ -80,7 +80,7 @@
 
 -(NSString*)postNotification { return @"com.efrederickson.glowboard/reloadSettings"; }
 -(NSString*)defaultsFileName { return @"com.efrederickson.glowboard.settings"; }
--(NSArray*) emailAddresses { return @[@"elijah.frederickson@gmail.com", @"andrewaboshartworks@gmail.com"]; }
+-(NSArray*) emailAddresses { return @[@"elijah.frederickson+glowboard@gmail.com", @"andrewaboshartworks+glowboard@gmail.com"]; }
 -(NSString*) emailBody { return @""; }
 -(NSString*) emailSubject { return @"GlowBoard"; }
 -(NSString*) enabledDescription { return @"Quickly enable or disable GlowBoard."; }

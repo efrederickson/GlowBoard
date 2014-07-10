@@ -191,7 +191,7 @@
 			<string>Other</string>
 
 			<key>footerText</key>
-			<string>* requires a respring</string>
+			<string>* Requires a Respring. May fix bouncing/pulsing even after notifications and badges are cleared.</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -220,6 +220,51 @@
 			<string>Require Badge for Notification*</string>
 			<key>PostNotification</key>
 			<string>com.efrederickson.glowboard/reloadSettings</string>
+		</dict>
+		<dict>
+			<key>ALAllowsSelection</key>
+			<string>1</string>
+			<key>ALChangeNotification</key>
+			<string>com.efrederickson.glowboard/reloadSettings</string>
+			<key>ALSectionDescriptors</key>
+			<array>
+				<dict>
+					<key>cell-class-name</key>
+					<string>ALSwitchCell</string>
+					<key>icon-size</key>
+					<string>29</string>
+					<key>predicate</key>
+					<string>(isSystemApplication = TRUE)</string>
+					<key>suppress-hidden-apps</key>
+					<string>1</string>
+					<key>title</key>
+					<string>System Applications</string>
+				</dict>
+				<dict>
+					<key>cell-class-name</key>
+					<string>ALSwitchCell</string>
+					<key>icon-size</key>
+					<string>29</string>
+					<key>predicate</key>
+					<string>(isSystemApplication = FALSE)</string>
+					<key>suppress-hidden-apps</key>
+					<string>1</string>
+					<key>title</key>
+					<string>User Applications</string>
+				</dict>
+			</array>
+			<key>ALSettingsKeyPrefix</key>
+			<string>Blacklist-</string>
+			<key>ALSettingsPath</key>
+			<string>/var/mobile/Library/Preferences/com.efrederickson.glowboard.settings.plist</string>
+			<key>bundle</key>
+			<string>AppList</string>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>isController</key>
+			<true/>
+			<key>label</key>
+			<string>Blacklisted apps</string>
 		</dict>
 	</array>
 	<key>title</key>
