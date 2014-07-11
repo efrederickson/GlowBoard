@@ -192,7 +192,7 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     v._iconImageView.layer.shadowColor = getColor(v._iconImageView).CGColor; // This is handled later in the CALayer hook also
     
     
-    if (((v.icon.badgeValue != 0 || [ncIcons containsObject:v.icon]) && disableNotificationGlow)
+    if (((v.icon.badgeValue != 0 || [ncIcons containsObject:v.icon]) && disableNotificationGlow && v.icon.application.isRunning == NO)
     || (v.icon.application.isRunning && disableRunningGlow)
     || ((v.icon.application._isRecentlyUpdated || v.icon.application._isNewlyInstalled) && disableUpdateGlow)
     )
