@@ -147,9 +147,6 @@ void reloadSettings(CFNotificationCenterRef center,
 
 void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
 {
-    //if (((SpringBoard *)[UIApplication sharedApplication]).isLocked)
-    //    return;
-    
     BOOL isBlacklisted = NO;
     NSString *prefix = @"Blacklist-";
     NSString *identifier = v.icon.applicationBundleID;
