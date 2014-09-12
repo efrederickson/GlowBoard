@@ -26,7 +26,7 @@
     prefs[@"enabled"] = newState == FSSwitchStateOn ? @YES : @NO;
     
     [prefs writeToFile:@"/var/mobile/Library/Preferences/com.efrederickson.glowboard.settings.plist" atomically:YES];
-	CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(), CFSTR(“com.efrederickson.glowboard/reloadSettings"), NULL, NULL, true);
+	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.efrederickson.glowboard/reloadSettings"), NULL, NULL, true);
 }
 
 @end

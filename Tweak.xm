@@ -19,6 +19,8 @@ struct STKGroupSlot { // Apex 2
 NSMutableSet *suppressedIcons; // Used for Apex 2 compatibility
 NSMutableSet *ncIcons = [[NSMutableSet alloc] init];
 
+NSDictionary *prefs = nil;
+
 BOOL enabled = YES;
 BOOL showInSwitcher = YES;
 BOOL glowDock = YES;
@@ -31,7 +33,6 @@ BOOL disableRunningGlow = NO;
 BOOL requireBadge = YES;
 int badgedColorMode = 2;
 int activeColorMode = 0;
-NSDictionary *blacklist = [[NSDictionary dictionary] retain];
 BOOL disableUpdateGlow = NO;
 int updatedColorMode = 3;
 
@@ -68,8 +69,12 @@ void reloadSettings(CFNotificationCenterRef center,
                                     const void *object,
                                     CFDictionaryRef userInfo)
 {
-    NSDictionary *prefs = [NSDictionary 
-        dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.efrederickson.glowboard.settings.plist"];
+    if (prefs)
+    {
+        [prefs release];
+        prefs = nil;
+    }
+    prefs = [[NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.efrederickson.glowboard.settings.plist"] retain];
 
     if ([prefs objectForKey:@"enabled"] != nil)
         enabled = [[prefs objectForKey:@"enabled"] boolValue];
@@ -140,18 +145,17 @@ void reloadSettings(CFNotificationCenterRef center,
         updatedColorMode = [[prefs objectForKey:@"updatedColor"] intValue];
     else
         updatedColorMode = 3;
-
-    blacklist = [[NSDictionary
-        dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.efrederickson.glowboard.settings.plist"] retain];
 }
 
 void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
 {
     BOOL isBlacklisted = NO;
-    NSString *prefix = @"Blacklist-";
-    NSString *identifier = v.icon.applicationBundleID;
-    if (blacklist != nil && identifier != nil && [[blacklist objectForKey: [prefix stringByAppendingString:identifier]] boolValue])
-        isBlacklisted = YES;
+    if (v.icon.application)
+    {
+        NSString *identifier = v.icon.application.bundleIdentifier;
+        if (prefs != nil && identifier != nil && [[prefs objectForKey: [@"Blacklist-" stringByAppendingString:identifier]] boolValue])
+            isBlacklisted = YES;
+    }
 
     if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0 && [ncIcons containsObject:v.icon] == NO && v.icon.application._isRecentlyUpdated == NO && v.icon.application._isNewlyInstalled == NO)
     || ([suppressedIcons containsObject:v.icon] && isSwitcher == NO) 
