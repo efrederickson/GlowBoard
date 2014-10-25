@@ -10,8 +10,25 @@
 #import <SpringBoard/SBApplication.h>
 #import <QuartzCore/QuartzCore.h>
 
-@interface SBIconLabelView : UIView
+/* IOS 8 BLUR EFFECT VIEW STRIPPED HEADER INFO */
+typedef enum {
+   UIBlurEffectStyleExtraLight ,
+   UIBlurEffectStyleLight ,
+   UIBlurEffectStyleDark 
+} UIBlurEffectStyle;
+@interface UIBlurEffect
++ (id)effectWithStyle:(long long)arg1;
+@end
+@interface UIVisualEffectView : UIView
+- (id)initWithEffect:(id)arg1;
+@end
+/* END */
 
+@interface SBIconLabelView : UIView
+@end
+
+@interface SBIcon (iOS81)
+-(BOOL) isBeta;
 @end
 
 @interface SBIconModel (iOS81)

@@ -23,6 +23,14 @@ void updateGlowView(SBIconView *v, BOOL forceNotif, BOOL isSwitcher);
 #define kGB_NotifAnimKey @"GB_NotifAnimKey"
 #define kGB_PulseAnimKey @"GB_PulseAnimKey"
 
+typedef enum {
+    GBDotStyleDark,
+    GBDotStyleLight,
+    GBDotStyleDarkBlur,
+    GBDotStyleLightBlur,
+    GBDotStyleExtraLightBlur,
+} GBDotStyle;
+
 NSMutableSet *suppressedIcons; // Used for Apex 2 compatibility
 NSMutableSet *ncIcons = [[NSMutableSet alloc] init];
 
@@ -43,14 +51,25 @@ int activeColorMode = 0;
 BOOL disableUpdateGlow = NO;
 int updatedColorMode = 3;
 BOOL showDot = YES;
-BOOL showDotOnlyOnDock = YES;
+BOOL showDotInSwitcher = YES;
 CGFloat dotSize = 5;
 BOOL shiftDockUp = YES;
+GBDotStyle dotStyle = GBDotStyleDark;
+int betaColorMode = 9;
+BOOL disableBetaGlow = NO;
+
+/* iOS 8 only so moved here for simple checking (lower iOS versions) */
+BOOL iconIsBeta(SBIcon *icon)
+{
+    if ([icon respondsToSelector:@selector(isBeta)])
+        return icon.isBeta;
+    return NO;
+}
 
 UIColor* getColor(SBIconImageView *view)
 {
     BOOL isUpdated = disableUpdateGlow == NO && (view.icon.application._isRecentlyUpdated || view.icon.application._isNewlyInstalled);
-    int color = view.icon.application.isRunning ? activeColorMode : (isUpdated ? updatedColorMode : badgedColorMode);
+    int color = view.icon.application.isRunning ? activeColorMode : (isUpdated ? updatedColorMode : (iconIsBeta(view.icon) ? betaColorMode : badgedColorMode));
     UIColor *c = [UIColor whiteColor];
     if (color == 0) // WHITE
         c = [UIColor whiteColor];
@@ -70,6 +89,8 @@ UIColor* getColor(SBIconImageView *view)
         c = [UIColor blackColor];
     else if (color == 8) // ADAPTIVE
         c = [view.contentsImage averageColor];
+    else if (color == 9) // ORANGE
+        c = [UIColor orangeColor];
             
     return c;
 }
@@ -162,10 +183,10 @@ void reloadSettings(CFNotificationCenterRef center,
     else
         showDot = YES;
 
-    if ([prefs objectForKey:@"showDotOnlyOnDock"] != nil)
-        showDotOnlyOnDock = [[prefs objectForKey:@"showDotOnlyOnDock"] boolValue];
+    if ([prefs objectForKey:@"showDotInSwitcher"] != nil)
+        showDotInSwitcher = [[prefs objectForKey:@"showDotInSwitcher"] boolValue];
     else
-        showDotOnlyOnDock = YES;
+        showDotInSwitcher = YES;
 
     if ([prefs objectForKey:@"dotSize"] != nil)
         dotSize = [[prefs objectForKey:@"dotSize"] floatValue];
@@ -177,6 +198,20 @@ void reloadSettings(CFNotificationCenterRef center,
     else
         shiftDockUp = YES;
 
+    if ([prefs objectForKey:@"dotStyle"] != nil)
+        dotStyle = (GBDotStyle)[[prefs objectForKey:@"dotStyle"] intValue];
+    else
+        dotStyle = GBDotStyleDark;
+
+   if ([prefs objectForKey:@"disableBetaGlow"] != nil)
+        disableBetaGlow = [[prefs objectForKey:@"disableBetaGlow"] boolValue];
+    else
+        disableBetaGlow = NO;
+
+    if ([prefs objectForKey:@"betaColorMode"] != nil)
+        betaColorMode = [[prefs objectForKey:@"betaColorMode"] intValue];
+    else
+        betaColorMode = 9;
 }
 
 SBIconView *getIconView(NSString *ident)
@@ -210,7 +245,7 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
             isBlacklisted = YES;
     }
 
-    if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0 && [ncIcons containsObject:v.icon] == NO && v.icon.application._isRecentlyUpdated == NO && v.icon.application._isNewlyInstalled == NO)
+    if ((v.icon.application.isRunning == NO && v.icon.badgeValue == 0 && [ncIcons containsObject:v.icon] == NO && v.icon.application._isRecentlyUpdated == NO && v.icon.application._isNewlyInstalled == NO && iconIsBeta(v.icon) == NO)
     || ([suppressedIcons containsObject:v.icon] && isSwitcher == NO) 
     || enabled == NO 
     || ([v isKindOfClass:[%c(SBFolderIconView) class]] && glowFolders == NO) 
@@ -227,14 +262,41 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     }
 
     // "dot" under label
-    if (v.icon.application.isRunning && showDot && (showDotOnlyOnDock ? [v isInDock] : YES))
+    if (v.icon.application.isRunning && showDot && [v isInDock]) // && (showDotInSwitcher ? (isSwitcher || [v isInDock]) : NO))
     {
         if ([v viewWithTag:dotTag] == nil)
         {
             UIView *dotView = [[UIView alloc] init];
-            dotView.frame = CGRectMake((v.frame.size.width / 2) - (dotSize / 2), v.frame.size.height + (shiftDockUp ? 2 : 0), dotSize, dotSize);
+            dotView.frame = CGRectMake((v.frame.size.width / 2) - (dotSize / 2), v.frame.size.height + (shiftDockUp || isSwitcher ? 2 : 0), dotSize, dotSize);
             dotView.tag = dotTag;
-            dotView.backgroundColor = [UIColor blackColor];
+            dotView.clipsToBounds = YES;
+
+
+            if (dotStyle == GBDotStyleDark)
+                dotView.backgroundColor = [UIColor blackColor];
+            else if (dotStyle == GBDotStyleLight)
+                dotView.backgroundColor = [UIColor whiteColor];
+            else if (dotStyle == GBDotStyleLightBlur)
+            {
+                UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+                UIView *blurView = [[UIVisualEffectView alloc] initWithEffect:blur];
+                blurView.frame = (CGRect){ {0, 0}, dotView.frame.size };
+                [dotView addSubview:blurView];
+            }
+            else if (dotStyle == GBDotStyleExtraLightBlur)
+            {
+                UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
+                UIView *blurView = [[UIVisualEffectView alloc] initWithEffect:blur];
+                blurView.frame = (CGRect){ {0, 0}, dotView.frame.size };
+                [dotView addSubview:blurView];
+            }
+            else if (dotStyle == GBDotStyleDarkBlur)
+            {
+                UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+                UIView *blurView = [[UIVisualEffectView alloc] initWithEffect:blur];
+                blurView.frame = (CGRect){ {0, 0}, dotView.frame.size };
+                [dotView addSubview:blurView];
+            }
 
             CGPoint saveCenter = dotView.center;
             dotView.layer.cornerRadius = dotSize / 2.0;
@@ -247,7 +309,7 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
         else
         {
             UIView *dotView = [v viewWithTag:dotTag];
-            dotView.frame = CGRectMake((v.frame.size.width / 2) - (dotSize / 2), v.frame.size.height + (shiftDockUp ? 2 : 0), dotSize, dotSize);
+            dotView.frame = CGRectMake((v.frame.size.width / 2) - (dotSize / 2), v.frame.size.height + (shiftDockUp || isSwitcher  ? 2 : 0), dotSize, dotSize);
 
             CGPoint saveCenter = dotView.center;
             dotView.layer.cornerRadius = dotSize / 2.0;
@@ -282,9 +344,10 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     v._iconImageView.layer.shadowColor = getColor(v._iconImageView).CGColor; // This is handled later in the CALayer hook also
     
     
-    if (((v.icon.badgeValue != 0 || [ncIcons containsObject:v.icon]) && disableNotificationGlow && v.icon.application.isRunning == NO)
+    if (((v.icon.badgeValue != 0 || [ncIcons containsObject:v.icon]) && disableNotificationGlow && v.icon.application.isRunning == NO && iconIsBeta(v.icon) == NO)
     || (v.icon.application.isRunning && disableRunningGlow)
     || ((v.icon.application._isRecentlyUpdated || v.icon.application._isNewlyInstalled) && disableUpdateGlow)
+    || (iconIsBeta(v.icon) && disableBetaGlow)
     )
     {
         v._iconImageView.layer.shadowOpacity = 0;

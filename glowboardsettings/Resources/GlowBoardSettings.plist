@@ -127,7 +127,22 @@
 			<string>Disable Update Glow</string>
 			<key>PostNotification</key>
 			<string>com.efrederickson.glowboard/reloadSettings</string>
+		</dict>	
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.efrederickson.glowboard.settings</string>
+			<key>key</key>
+			<string>disableBetaGlow</string>
+			<key>label</key>
+			<string>Disable Beta (TestFlight) Glow</string>
+			<key>PostNotification</key>
+			<string>com.efrederickson.glowboard/reloadSettings</string>
 		</dict>
+
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
@@ -160,6 +175,7 @@
 				<string>Lime</string>
 				<string>Dark</string>
 				<string>Adaptive</string>
+				<string>Orange</string>
 			</array>
 			<key>validValues</key>
 			<array>
@@ -172,6 +188,7 @@
 				<integer>6</integer>
 				<integer>7</integer>
 				<integer>8</integer>
+				<integer>9</integer>
 			</array>
 		</dict>
 		<dict>
@@ -200,6 +217,7 @@
 				<string>Lime</string>
 				<string>Dark</string>
 				<string>Adaptive</string>
+				<string>Orange</string>
 			</array>
 			<key>validValues</key>
 			<array>
@@ -212,6 +230,7 @@
 				<integer>6</integer>
 				<integer>7</integer>
 				<integer>8</integer>
+				<integer>9</integer>
 			</array>
 		</dict>
 		<dict>
@@ -240,6 +259,7 @@
 				<string>Lime</string>
 				<string>Dark</string>
 				<string>Adaptive</string>
+				<string>Orange</string>
 			</array>
 			<key>validValues</key>
 			<array>
@@ -252,6 +272,49 @@
 				<integer>6</integer>
 				<integer>7</integer>
 				<integer>8</integer>
+				<integer>9</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>detail</key>
+			<string>GBColorSelectorController</string>
+			<key>default</key>
+			<integer>9</integer>
+			<key>defaults</key>
+			<string>com.efrederickson.glowboard.settings</string>
+			<key>key</key>
+			<string>betaColorMode</string>
+			<key>label</key>
+			<string>Beta (TestFlight) Color</string>
+			<key>PostNotification</key>
+			<string>com.efrederickson.glowboard/reloadSettings</string>
+			<key>validTitles</key>
+			<array>
+				<string>White</string>
+				<string>Light White</string>
+				<string>Red</string>
+				<string>Purple</string>
+				<string>Green</string>
+				<string>Blue</string>
+				<string>Lime</string>
+				<string>Dark</string>
+				<string>Adaptive</string>
+				<string>Orange</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>4</integer>
+				<integer>5</integer>
+				<integer>6</integer>
+				<integer>7</integer>
+				<integer>8</integer>
+				<integer>9</integer>
 			</array>
 		</dict>
 
@@ -289,7 +352,7 @@
 			<key>PostNotification</key>
 			<string>com.efrederickson.glowboard/reloadSettings</string>
 		</dict>
-		<dict>
+		<!--<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
@@ -297,17 +360,49 @@
 			<key>defaults</key>
 			<string>com.efrederickson.glowboard.settings</string>
 			<key>key</key>
-			<string>showDotOnlyOnDock</string>
+			<string>showDotInSwitcher</string>
 			<key>label</key>
-			<string>Show only on dock</string>
+			<string>Show in Switcher</string>
 			<key>PostNotification</key>
 			<string>com.efrederickson.glowboard/reloadSettings</string>
+		</dict>-->
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>default</key>
+			<integer>0</integer>
+			<key>defaults</key>
+			<string>com.efrederickson.glowboard.settings</string>
+			<key>key</key>
+			<string>dotStyle</string>
+			<key>label</key>
+			<string>Dot Style *</string>
+			<key>PostNotification</key>
+			<string>com.efrederickson.glowboard/reloadSettings</string>
+			<key>validTitles</key>
+			<array>
+				<string>Dark</string>
+				<string>Light</string>
+				<string>Light Blur (iOS 8)</string>
+				<string>Extra Light Blur (iOS 8)</string>
+				<string>Dark Blur (iOS 8)</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>4</integer>
+			</array>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSStaticTextCell</string>
 			<key>label</key>
-			<string>Dot Size (default 5)</string>
+			<string>Dot Size (default 5) *</string>
 		</dict>
 		<dict>
 			<key>cell</key>
