@@ -541,6 +541,15 @@ BOOL AUXO2 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileS
 }
 %end
 
+%hook SBDockIconListView
+
+-(CGFloat)topIconInset{
+    return 10;
+    return %orig
+}
+
+%end
+
 %ctor
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
