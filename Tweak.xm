@@ -23,16 +23,11 @@ void updateGlowView(SBIconView *v, BOOL forceNotif, BOOL isSwitcher);
 #define kGB_NotifAnimKey @"GB_NotifAnimKey"
 #define kGB_PulseAnimKey @"GB_PulseAnimKey"
 
-typedef enum {
-    GBDotStyleDark,
-    GBDotStyleLight,
-    GBDotStyleDarkBlur,
-    GBDotStyleLightBlur,
-    GBDotStyleExtraLightBlur,
-} GBDotStyle;
 
 NSMutableSet *suppressedIcons; // Used for Apex 2 compatibility
 NSMutableSet *ncIcons = [[NSMutableSet alloc] init];
+const int dotTag = 2334;
+
 
 NSDictionary *prefs = nil;
 
@@ -54,7 +49,7 @@ BOOL showDot = YES;
 BOOL showDotInSwitcher = YES;
 CGFloat dotSize = 5;
 BOOL shiftDockUp = YES;
-GBDotStyle dotStyle = GBDotStyleDark;
+int dotStyle = 0;
 int betaColorMode = 9;
 BOOL disableBetaGlow = NO;
 
@@ -199,9 +194,9 @@ void reloadSettings(CFNotificationCenterRef center,
         shiftDockUp = YES;
 
     if ([prefs objectForKey:@"dotStyle"] != nil)
-        dotStyle = (GBDotStyle)[[prefs objectForKey:@"dotStyle"] intValue];
+        dotStyle = [[prefs objectForKey:@"dotStyle"] intValue];
     else
-        dotStyle = GBDotStyleDark;
+        dotStyle = 0;
 
    if ([prefs objectForKey:@"disableBetaGlow"] != nil)
         disableBetaGlow = [[prefs objectForKey:@"disableBetaGlow"] boolValue];
@@ -235,8 +230,6 @@ SBIconView *getIconView(NSString *ident)
 
 void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
 {
-    const int dotTag = 2334;
-
     BOOL isBlacklisted = NO;
     if (v.icon.application)
     {
@@ -266,44 +259,41 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     {
         if ([v viewWithTag:dotTag] == nil)
         {
-            UIView *dotView = [[UIView alloc] init];
-            dotView.frame = CGRectMake((v.frame.size.width / 2) - (dotSize / 2), v.frame.size.height + (shiftDockUp || isSwitcher ? 2 : 0), dotSize, dotSize);
+            UIView *dotView = [[UIView alloc] initWithFrame:CGRectMake((v.frame.size.width / 2) - (dotSize / 2), v.frame.size.height + (shiftDockUp || isSwitcher ? 2 : 0), dotSize, dotSize)];
             dotView.tag = dotTag;
             dotView.clipsToBounds = YES;
-
-
-            if (dotStyle == GBDotStyleDark)
-                dotView.backgroundColor = [UIColor blackColor];
-            else if (dotStyle == GBDotStyleLight)
-                dotView.backgroundColor = [UIColor whiteColor];
-            else if (dotStyle == GBDotStyleLightBlur)
-            {
-                UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
-                UIView *blurView = [[UIVisualEffectView alloc] initWithEffect:blur];
-                blurView.frame = (CGRect){ {0, 0}, dotView.frame.size };
-                [dotView addSubview:blurView];
-            }
-            else if (dotStyle == GBDotStyleExtraLightBlur)
-            {
-                UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
-                UIView *blurView = [[UIVisualEffectView alloc] initWithEffect:blur];
-                blurView.frame = (CGRect){ {0, 0}, dotView.frame.size };
-                [dotView addSubview:blurView];
-            }
-            else if (dotStyle == GBDotStyleDarkBlur)
-            {
-                UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
-                UIView *blurView = [[UIVisualEffectView alloc] initWithEffect:blur];
-                blurView.frame = (CGRect){ {0, 0}, dotView.frame.size };
-                [dotView addSubview:blurView];
-            }
-
             CGPoint saveCenter = dotView.center;
             dotView.layer.cornerRadius = dotSize / 2.0;
             dotView.center = saveCenter;
 
+            if (dotStyle == 0)
+                dotView.backgroundColor = UIColor.blackColor;
+            else if (dotStyle == 1)
+                dotView.backgroundColor = UIColor.grayColor; // TODO: FIX WHITE
+            else if (dotStyle == 2)
+            {
+                UIBlurEffect *blur = [%c(UIBlurEffect) effectWithStyle:UIBlurEffectStyleLight];
+                UIView *blurView = [[%c(UIVisualEffectView) alloc] initWithEffect:blur];
+                blurView.frame = (CGRect){ {0, 0}, dotView.frame.size };
+                [dotView addSubview:blurView];
+            }
+            else if (dotStyle == 3)
+            {
+                UIBlurEffect *blur = [%c(UIBlurEffect) effectWithStyle:UIBlurEffectStyleExtraLight];
+                UIView *blurView = [[%c(UIVisualEffectView) alloc] initWithEffect:blur];
+                blurView.frame = (CGRect){ {0, 0}, dotView.frame.size };
+                [dotView addSubview:blurView];
+            }
+            else if (dotStyle == 4)
+            {
+                UIBlurEffect *blur = [%c(UIBlurEffect) effectWithStyle:UIBlurEffectStyleDark];
+                UIView *blurView = [[%c(UIVisualEffectView) alloc] initWithEffect:blur];
+                blurView.frame = (CGRect){ {0, 0}, dotView.frame.size };
+                [dotView addSubview:blurView];
+            }
+
             //SBIconLabelView *_labelView;
-            //[MSHookIvar<SBIconLabelView*>(v, "_labelView") addSubView:dotView];
+            //[MSHookIvar<SBIconLabelView*>(v, "_labelView") addSubview:dotView];
             [v addSubview:dotView];
         }
         else
