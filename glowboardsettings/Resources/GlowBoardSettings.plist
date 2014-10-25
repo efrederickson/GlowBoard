@@ -289,7 +289,6 @@
 			<key>PostNotification</key>
 			<string>com.efrederickson.glowboard/reloadSettings</string>
 		</dict>
-		<!--
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
@@ -303,7 +302,7 @@
 			<string>Show only on dock</string>
 			<key>PostNotification</key>
 			<string>com.efrederickson.glowboard/reloadSettings</string>
-		</dict>-->
+		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSStaticTextCell</string>
