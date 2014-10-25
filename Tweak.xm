@@ -45,6 +45,7 @@ int updatedColorMode = 3;
 BOOL showDot = YES;
 BOOL showDotOnlyOnDock = YES;
 CGFloat dotSize = 5;
+BOOL shiftDockUp = YES;
 
 UIColor* getColor(SBIconImageView *view)
 {
@@ -170,6 +171,12 @@ void reloadSettings(CFNotificationCenterRef center,
         dotSize = [[prefs objectForKey:@"dotSize"] floatValue];
     else
         dotSize = 5;
+
+    if ([prefs objectForKey:@"shiftDockUp"] != nil)
+        shiftDockUp = [[prefs objectForKey:@"shiftDockUp"] boolValue];
+    else
+        shiftDockUp = YES;
+
 }
 
 SBIconView *getIconView(NSString *ident)
@@ -219,14 +226,13 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
         return;
     }
 
-
     // "dot" under label
     if (v.icon.application.isRunning && showDot && (showDotOnlyOnDock ? [v isInDock] : YES))
     {
         if ([v viewWithTag:dotTag] == nil)
         {
             UIView *dotView = [[UIView alloc] init];
-            dotView.frame = CGRectMake((v.frame.size.width / 2) - (dotSize / 2), v.frame.size.height, dotSize, dotSize);
+            dotView.frame = CGRectMake((v.frame.size.width / 2) - (dotSize / 2), v.frame.size.height + (shiftDockUp ? 2 : 0), dotSize, dotSize);
             dotView.tag = dotTag;
             dotView.backgroundColor = [UIColor blackColor];
 
@@ -241,7 +247,7 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
         else
         {
             UIView *dotView = [v viewWithTag:dotTag];
-            dotView.frame = CGRectMake((v.frame.size.width / 2) - (dotSize / 2), v.frame.size.height, dotSize, dotSize);
+            dotView.frame = CGRectMake((v.frame.size.width / 2) - (dotSize / 2), v.frame.size.height + (shiftDockUp ? 2 : 0), dotSize, dotSize);
 
             CGPoint saveCenter = dotView.center;
             dotView.layer.cornerRadius = dotSize / 2.0;
@@ -542,12 +548,7 @@ BOOL AUXO2 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileS
 %end
 
 %hook SBDockIconListView
-
--(CGFloat)topIconInset{
-    return 10;
-    return %orig
-}
-
+-(CGFloat)topIconInset { return shiftDockUp ? 10 : %orig; }
 %end
 
 %ctor
