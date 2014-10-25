@@ -254,6 +254,68 @@
 				<integer>8</integer>
 			</array>
 		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Active Dot</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.efrederickson.glowboard.settings</string>
+			<key>key</key>
+			<string>showDot</string>
+			<key>label</key>
+			<string>Show Dot</string>
+			<key>PostNotification</key>
+			<string>com.efrederickson.glowboard/reloadSettings</string>
+		</dict><!--
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.efrederickson.glowboard.settings</string>
+			<key>key</key>
+			<string>showDotOnlyOnDock</string>
+			<key>label</key>
+			<string>Show only on dock</string>
+			<key>PostNotification</key>
+			<string>com.efrederickson.glowboard/reloadSettings</string>
+		</dict>-->
+		<dict>
+			<key>cell</key>
+			<string>PSStaticTextCell</string>
+			<key>label</key>
+			<string>Dot Size (default 5)</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>default</key>
+			<real>5</real>
+			<key>defaults</key>
+			<string>com.efrederickson.glowboard.settings</string>
+			<key>key</key>
+			<string>dotSize</string>
+			<key>label</key>
+			<string>Dot Size</string>
+			<key>PostNotification</key>
+			<string>com.efrederickson.glowboard/reloadSettings</string>
+			<key>showValue</key>
+			<true/>
+			<key>max</key>
+			<integer>10</integer>
+			<key>min</key>
+			<integer>2</integer>
+		</dict>
+
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>

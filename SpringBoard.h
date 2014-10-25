@@ -10,6 +10,14 @@
 #import <SpringBoard/SBApplication.h>
 #import <QuartzCore/QuartzCore.h>
 
+@interface SBIconLabelView : UIView
+
+@end
+
+@interface SBIconModel (iOS81)
+- (id)applicationIconForBundleIdentifier:(id)arg1;
+@end
+
 @interface SBIconModel (iOS40)
 - (/*SBApplicationIcon*/SBIcon *)applicationIconForDisplayIdentifier:(NSString *)displayIdentifier;
 @end
