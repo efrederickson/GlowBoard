@@ -330,6 +330,7 @@ void updateGlowView(SBIconView *v, BOOL forceNotif = NO, BOOL isSwitcher = NO)
     }
 
     v._iconImageView.layer.shadowRadius = 13;
+    v._iconImageView.layer.shadowOpacity = 1;
     v._iconImageView.layer.shadowPath = [UIBezierPath bezierPathWithRect:v._iconImageView.layer.bounds].CGPath;
     v._iconImageView.layer.shadowColor = getColor(v._iconImageView).CGColor; // This is handled later in the CALayer hook also
     
